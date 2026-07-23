@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public class Notification {
 
     @Id
-    private String notificationId;
+    private String Id;
 
     @Column(nullable = false)
     private String title;
@@ -31,7 +31,7 @@ we'll activate them once we have the Student entity
     }
 
     private Notification(Builder builder) {
-        this.notificationId = builder.notificationId;
+        this.Id = builder.Id;
         this.title = builder.title;
         this.message = builder.message;
         this.read = builder.read;
@@ -39,8 +39,8 @@ we'll activate them once we have the Student entity
       //  this.student = builder.student;
     }
 
-    public String getNotificationId() {
-        return notificationId;
+    public String getId() {
+        return Id;
     }
 
     public String getTitle() {
@@ -51,7 +51,7 @@ we'll activate them once we have the Student entity
         return message;
     }
 
-    public Boolean getRead() {
+    public boolean getRead() {
         return read;
     }
 
@@ -70,7 +70,7 @@ we'll activate them once we have the Student entity
     @Override
     public String toString() {
         return "Notification{" +
-                "notificationId='" + notificationId + '\'' +
+                "notificationId='" + Id + '\'' +
                 ", title='" + title + '\'' +
                 ", message='" + message + '\'' +
                 ", read=" + read +
@@ -80,15 +80,15 @@ we'll activate them once we have the Student entity
 
     public static class Builder {
 
-        private String notificationId;
+        private String Id;
         private String title;
         private String message;
-        private Boolean read;
+        private boolean read;
         private LocalDateTime createdAt;
        // private Student student;
 
-        public Builder setNotificationId(String notificationId) {
-            this.notificationId = notificationId;
+        public Builder setId(String Id) {
+            this.Id = Id;
             return this;
         }
 
@@ -118,7 +118,7 @@ we'll activate them once we have the Student entity
         }
 */
         public Builder copy(Notification notification) {
-            this.notificationId = notification.notificationId;
+            this.Id = notification.Id;
             this.title = notification.title;
             this.message = notification.message;
             this.read = notification.read;
