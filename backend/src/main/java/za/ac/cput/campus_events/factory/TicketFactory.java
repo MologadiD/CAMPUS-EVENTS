@@ -1,6 +1,6 @@
 package za.ac.cput.campus_events.factory;
 
-import za.ac.cput.campus_events.model.Ticket;
+import za.ac.cput.campus_events.domain.Ticket;
 
 public class TicketFactory {
     public static Ticket createTicket(Long studentId, Long eventId, Long promoCodeId, Double price) {

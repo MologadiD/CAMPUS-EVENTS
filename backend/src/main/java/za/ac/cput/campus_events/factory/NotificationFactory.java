@@ -1,6 +1,6 @@
 package za.ac.cput.campus_events.factory;
 
-import za.ac.cput.campus_events.entity.Notification;
+import za.ac.cput.campus_events.domain.Notification;
 import java.time.LocalDateTime;
 
 public class NotificationFactory {
