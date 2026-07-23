@@ -87,7 +87,15 @@ public class Login extends JFrame {
 
 
     public static void main(String[] args) {
-       Login login = new Login();
-       login.setVisible(true);
+        try {
+                   UIManager.setLookAndFeel(new com.formdev.flatlaf.FlatLightLaf());
+               } catch (UnsupportedLookAndFeelException e) {
+                   e.printStackTrace();
+               }
+
+               SwingUtilities.invokeLater(() -> {
+                   Login login = new Login();
+                   login.setVisible(true);
+               });
     }
 }
