@@ -44,6 +44,45 @@ public class Login extends JFrame {
         pwdPassword = new JPasswordField(20);
         btnLogin = new JButton("Sign in");
         btnGoRegister = new JButton("Create an account");
+
+        JPanel root = new JPanel(new BorderLayout(0, 24));
+             root.setBorder(BorderFactory.createEmptyBorder(30, 40, 30, 40));
+
+             JPanel rolePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 0));
+             rolePanel.add(btnRoleStudent);
+             rolePanel.add(btnRoleOrganiser);
+             rolePanel.add(btnRoleAdmin);
+             root.add(rolePanel, BorderLayout.NORTH);
+
+             JPanel formPanel = new JPanel(new GridBagLayout());
+             GridBagConstraints gbc = new GridBagConstraints();
+             gbc.insets = new Insets(8, 8, 8, 8);
+             gbc.fill = GridBagConstraints.HORIZONTAL;
+             gbc.gridx = 0;
+             gbc.gridwidth = 1;
+
+             gbc.gridy = 0;
+             formPanel.add(new JLabel("Student number / Email:"), gbc);
+             gbc.gridy = 1;
+             formPanel.add(txtIdentifier, gbc);
+
+             gbc.gridy = 2;
+             formPanel.add(new JLabel("Password:"), gbc);
+             gbc.gridy = 3;
+             formPanel.add(pwdPassword, gbc);
+
+             gbc.gridy = 4;
+             formPanel.add(btnLogin, gbc);
+
+             gbc.gridy = 5;
+             formPanel.add(btnGoRegister, gbc);
+
+             // Center the form in the wide window instead of stretching it edge to edge
+             JPanel formWrapper = new JPanel(new GridBagLayout());
+             formWrapper.add(formPanel);
+             root.add(formWrapper, BorderLayout.CENTER);
+
+             setContentPane(root);
     }
 
 
