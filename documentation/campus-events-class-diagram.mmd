@@ -1,0 +1,219 @@
+%% NOTE: erDiagram (campus-events-erd.mmd) only shows attributes — mermaid's ER
+%% syntax has no notion of methods. This file uses classDiagram instead, which
+%% supports visibility (+/-), return types, and parameters.
+%%
+%% Address is marked <<Embeddable>> — no id, no own table, not one of the 9
+%% persisted entities. Included as the 10th deliverable, not as a real entity.
+%%
+%% v2 changes: all FKs shown explicitly as attributes (not just hidden behind
+%% getters). Faculty is now created directly by Admin (createdByAdminId FK) —
+%% Organiser and Student both link to Faculty via facultyId. Organiser has its
+%% own verificationStatus, approved separately via Admin.approveOrganiser().
+%% PromoCode gains scopeType (PLATFORM/EVENT/FACULTY) + facultyId, so a code can
+%% auto-discount any student in a given faculty regardless of which event.
+
+classDiagram
+  class Student {
+    -Long id
+    -String firstName
+    -String lastName
+    -String email
+    -String studentNumber
+    -String verificationStatus
+    -Long facultyId
+    -LocalDateTime createdAt
+    +getId() Long
+    +getFirstName() String
+    +getLastName() String
+    +getEmail() String
+    +getStudentNumber() String
+    +getVerificationStatus() String
+    +getFaculty() Faculty
+    +getCreatedAt() LocalDateTime
+    +register(event) Ticket
+    +cancelTicket(ticket) void
+    +toString() String
+  }
+  class Organiser {
+    -Long id
+    -String firstName
+    -String lastName
+    -String email
+    -String verificationStatus
+    -Long facultyId
+    -LocalDateTime createdAt
+    +getId() Long
+    +getFirstName() String
+    +getLastName() String
+    +getEmail() String
+    +getVerificationStatus() String
+    +getFaculty() Faculty
+    +getCreatedAt() LocalDateTime
+    +createEvent(event) void
+    +updateEvent(event) void
+    +closeEvent(event) void
+    +toString() String
+  }
+  class Faculty {
+    -Long id
+    -String name
+    -String status
+    -String contactEmail
+    -Long createdByAdminId
+    -LocalDateTime createdAt
+    +getId() Long
+    +getName() String
+    +getStatus() String
+    +getContactEmail() String
+    +getCreatedByAdmin() Admin
+    +getCreatedAt() LocalDateTime
+    +toString() String
+  }
+  class Admin {
+    -Long id
+    -String firstName
+    -String lastName
+    -String email
+    -LocalDateTime createdAt
+    +getId() Long
+    +getFirstName() String
+    +getLastName() String
+    +getEmail() String
+    +getCreatedAt() LocalDateTime
+    +createFaculty(faculty) Faculty
+    +approveOrganiser(organiser) void
+    +approveStudent(student) void
+    +toString() String
+  }
+  class Event {
+    -Long id
+    -String title
+    -String description
+    -LocalDateTime eventDate
+    -Integer capacity
+    -Boolean open
+    -Long venueId
+    -Long organiserId
+    -Long facultyId
+    -LocalDateTime createdAt
+    +getId() Long
+    +getTitle() String
+    +getDescription() String
+    +getEventDate() LocalDateTime
+    +getCapacity() Integer
+    +isOpen() boolean
+    +getVenue() Venue
+    +getOrganiser() Organiser
+    +getFaculty() Faculty
+    +getCreatedAt() LocalDateTime
+    +registerStudent(student) Ticket
+    +closeRegistration() void
+    +reopenRegistration() void
+    +isFull() boolean
+    +toString() String
+  }
+  class Venue {
+    -Long id
+    -String name
+    -Integer capacity
+    +getId() Long
+    +getName() String
+    +getCapacity() Integer
+    +getAddress() Address
+    +toString() String
+  }
+  class Address {
+    <<Embeddable>>
+    -String street
+    -String suburb
+    -String city
+    -String postalCode
+    -String province
+    +getStreet() String
+    +getSuburb() String
+    +getCity() String
+    +getPostalCode() String
+    +getProvince() String
+    +toString() String
+  }
+  class Ticket {
+    -Long id
+    -Double price
+    -String status
+    -Long studentId
+    -Long eventId
+    -Long promoCodeId
+    -LocalDateTime createdAt
+    +getId() Long
+    +getPrice() Double
+    +getStatus() String
+    +getStudent() Student
+    +getEvent() Event
+    +getPromoCode() PromoCode
+    +getCreatedAt() LocalDateTime
+    +cancel() void
+    +checkIn() void
+    +isActive() boolean
+    +toString() String
+  }
+  class PromoCode {
+    -Long id
+    -String code
+    -String discountType
+    -Double value
+    -String scopeType
+    -Long eventId
+    -Long facultyId
+    -Integer maxRedemptions
+    -Integer timesUsed
+    -LocalDateTime startDate
+    -LocalDateTime expiryDate
+    -Boolean active
+    +getId() Long
+    +getCode() String
+    +getDiscountType() String
+    +getValue() Double
+    +getScopeType() String
+    +getEvent() Event
+    +getFaculty() Faculty
+    +getMaxRedemptions() Integer
+    +getTimesUsed() Integer
+    +getStartDate() LocalDateTime
+    +getExpiryDate() LocalDateTime
+    +isActive() boolean
+    +isValidNow() boolean
+    +applyTo(ticket) void
+    +toString() String
+  }
+  class Notification {
+    -Long id
+    -String title
+    -String message
+    -Boolean read
+    -Long studentId
+    -LocalDateTime createdAt
+    +getId() Long
+    +getTitle() String
+    +getMessage() String
+    +isRead() boolean
+    +getStudent() Student
+    +getCreatedAt() LocalDateTime
+    +markAsRead() void
+    +toString() String
+  }
+
+  Admin "1" --> "*" Faculty : creates
+  Admin "1" --> "*" Organiser : approves
+  Admin "1" --> "*" Student : approves
+  Faculty "1" --> "*" Organiser : facultyId
+  Faculty "1" --> "*" Student : facultyId
+  Faculty "1" --> "*" Event : facultyId
+  Faculty "1" --> "*" PromoCode : facultyId
+  Organiser "1" --> "*" Event : organiserId
+  Venue "1" --> "*" Event : venueId
+  Venue "1" *-- "1" Address : embeds
+  Event "1" --> "*" Ticket : eventId
+  Event "1" --> "*" PromoCode : eventId
+  Student "1" --> "*" Ticket : studentId
+  Student "1" --> "*" Notification : studentId
+  PromoCode "1" --> "*" Ticket : promoCodeId
