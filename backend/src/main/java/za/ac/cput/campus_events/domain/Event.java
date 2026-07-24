@@ -5,9 +5,6 @@ import java.time.LocalDateTime;
 
 @Entity
 public class Event {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     private String title;
     private String description;
@@ -22,7 +19,6 @@ public class Event {
 
     // Private constructor for Builder
     private Event(Builder builder) {
-        this.id = builder.id;
         this.title = builder.title;
         this.description = builder.description;
         this.eventDate = builder.eventDate;
@@ -34,7 +30,6 @@ public class Event {
 
     // Builder Pattern
     public static class Builder {
-        private Long id;
         private String title;
         private String description;
         private LocalDateTime eventDate;
@@ -43,20 +38,18 @@ public class Event {
         private LocalDateTime createdAt;
         private Venue venue;
 
-        public Builder id(Long id) { this.id = id; return this; }
-        public Builder title(String title) { this.title = title; return this; }
-        public Builder description(String description) { this.description = description; return this; }
-        public Builder eventDate(LocalDateTime eventDate) { this.eventDate = eventDate; return this; }
-        public Builder capacity(Integer capacity) { this.capacity = capacity; return this; }
-        public Builder open(Boolean open) { this.open = open; return this; }
-        public Builder createdAt(LocalDateTime createdAt) { this.createdAt = createdAt; return this; }
-        public Builder venue(Venue venue) { this.venue = venue; return this; }
+        public Builder setTitle(String title) { this.title = title; return this; }
+        public Builder setDescription(String description) { this.description = description; return this; }
+        public Builder setEventDate(LocalDateTime eventDate) { this.eventDate = eventDate; return this; }
+        public Builder setCapacity(Integer capacity) { this.capacity = capacity; return this; }
+        public Builder setOpen(Boolean open) { this.open = open; return this; }
+        public Builder setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; return this; }
+        public Builder setVenue(Venue venue) { this.venue = venue; return this; }
 
         public Event build() { return new Event(this); }
     }
 
     // Getters
-    public Long getId() { return id; }
     public String getTitle() { return title; }
     public String getDescription() { return description; }
     public LocalDateTime getEventDate() { return eventDate; }
@@ -68,8 +61,7 @@ public class Event {
     @Override
     public String toString() {
         return "Event{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
+                "title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", eventDate=" + eventDate +
                 ", capacity=" + capacity +
@@ -79,3 +71,4 @@ public class Event {
                 '}';
     }
 }
+
