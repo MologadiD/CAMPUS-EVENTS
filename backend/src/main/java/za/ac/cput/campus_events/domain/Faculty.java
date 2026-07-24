@@ -1,7 +1,6 @@
 package za.ac.cput.campus_events.domain;
 import jakarta.persistence.*;
 import za.ac.cput.campus_events.util.Helper;
-
 import java.time.LocalDateTime;
 /*
 Mologadi Dikagle
