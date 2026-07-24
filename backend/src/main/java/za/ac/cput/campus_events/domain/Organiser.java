@@ -6,7 +6,9 @@ Student No: 231016263
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+
 
 @Entity
 public class Organiser {
@@ -32,7 +34,8 @@ public class Organiser {
         this.email     = builder.email;
         this.role      = builder.role;
         this.createdAt = builder.createdAt;
-        this.events    = builder.events;
+        // we'll create an addEvent method so for now just init
+        this.events = new ArrayList<>();
     }
 
     public Long          getId()        { return id; }
@@ -42,18 +45,6 @@ public class Organiser {
     public String        getRole()      { return role; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public List<Event>   getEvents()    { return events; }
-
-    public void createEvent() {
-        // business logic for creating an event
-    }
-
-    public void updateEvent(Event event) {
-        // business logic for updating an event
-    }
-
-    public void closeEvent(Event event) {
-        // business logic for closing an event
-    }
 
     @Override
     public String toString() {
@@ -76,41 +67,29 @@ public class Organiser {
         private LocalDateTime createdAt;
         private List<Event>   events;
 
-        public Builder id(Long id) {
-            this.id = id;
-            return this;
-        }
-        public Builder firstName(String firstName) {
+
+        public Builder setFirstName(String firstName) {
             this.firstName = firstName;
             return this;
         }
-        public Builder lastName(String lastName) {
+        public Builder setLastName(String lastName) {
             this.lastName = lastName;
             return this;
         }
-        public Builder email(String email) {
+        public Builder setEmail(String email) {
             this.email = email;
             return this;
         }
-        public Builder role(String role) {
+        public Builder setRole(String role) {
             this.role = role;
             return this;
         }
-        public Builder createdAt(LocalDateTime createdAt) {
+        public Builder setCreatedAt(LocalDateTime createdAt) {
             this.createdAt = createdAt;
-            return this;
-        }
-        public Builder events(List<Event> events) {
-            this.events = events;
             return this;
         }
 
         public Organiser build() {
-            if (Helper.isNullOrEmpty(firstName)) return null;
-            if (Helper.isNullOrEmpty(lastName))  return null;
-            if (!Helper.isValidEmail(email))     return null;
-            if (Helper.isNullOrEmpty(role))      return null;
-            if (createdAt == null) createdAt = LocalDateTime.now();
             return new Organiser(this);
         }
     }
