@@ -15,22 +15,23 @@ public class Venue {
     private Address address;
 
     private Venue(Builder builder) {
-        this.id = builder.id;
         this.name = builder.name;
         this.capacity = builder.capacity;
         this.address = builder.address;
     }
 
+    public Venue() {
+
+    }
+
     public static class Builder {
-        private Long id;
         private String name;
         private Integer capacity;
         private Address address;
 
-        public Builder id(Long id) { this.id = id; return this; }
-        public Builder name(String name) { this.name = name; return this; }
-        public Builder capacity(Integer capacity) { this.capacity = capacity; return this; }
-        public Builder address(Address address) { this.address = address; return this; }
+        public Builder setName(String name) { this.name = name; return this; }
+        public Builder setCapacity(Integer capacity) { this.capacity = capacity; return this; }
+        public Builder setAddress(Address address) { this.address = address; return this; }
 
         public Venue build() { return new Venue(this); }
     }
