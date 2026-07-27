@@ -6,6 +6,9 @@ import java.time.LocalDateTime;
 @Entity
 public class Event {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
     private String title;
     private String description;
     private LocalDateTime eventDate;
@@ -55,6 +58,14 @@ public class Event {
         public Builder setVenue(Venue venue) { this.venue = venue; return this; }
 
         public Event build() { return new Event(this); }
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     // Getters
