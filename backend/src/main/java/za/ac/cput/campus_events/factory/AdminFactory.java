@@ -1,0 +1,29 @@
+package za.ac.cput.campus_events.factory;
+
+import za.ac.cput.campus_events.domain.Admin;
+import za.ac.cput.campus_events.util.EmailValidator;
+
+public class AdminFactory {
+
+    public static Admin createAdmin(String firstName, String lastName,
+                                        String email){
+
+        if(firstName == null || firstName.length() < 3){
+            return null;
+        }
+
+        if(lastName == null || lastName.length() < 3){
+            return null;
+        }
+
+        if(EmailValidator.isValid(email)){
+            return null;
+        }
+
+        return new Admin.Builder()
+                .setFirstName(firstName)
+                .setEmail(email)
+                .setLastName(lastName)
+                .build();
+    }
+}
