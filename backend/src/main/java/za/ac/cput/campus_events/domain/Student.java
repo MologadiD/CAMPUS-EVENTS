@@ -13,6 +13,7 @@ public class Student {
     private String lastName;
     private String email;
     private String studentNumber; // some cool validation for this later
+    private String password;
 
     private boolean isVerified = false; // we dont want to expose this to the builder, only the Admin
 
@@ -66,6 +67,12 @@ public class Student {
         private String email;
         private String studentNumber;
         private Faculty faculty;
+        private String password;
+
+        public Builder setPassword(String password){
+            this.password = password;
+            return this;
+        }
 
         public Builder setFirstName(String firstName) {
             this.firstName = firstName;

@@ -16,8 +16,8 @@ public class Notification {
     @Column(nullable = false, length = 1000)
     private String message;
 
-    @Column(nullable = false)
-    private Boolean read;
+    @Column(name = "is_read")
+    private boolean read;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
