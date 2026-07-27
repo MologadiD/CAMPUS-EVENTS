@@ -7,5 +7,5 @@ import za.ac.cput.campus_events.domain.Venue;
 @Repository
 public interface VenueRepository extends JpaRepository<Venue, Long> {
     // Plain CRUD is automatically provided by JpaRepository
-    // No extra methods needed unless you want custom queries later
+    // No extra methods needed unless if custom queries are added  later
 }
