@@ -3,19 +3,23 @@ package za.ac.cput.campus_events.factory;
 Mologadi Dikgale
 Student No: 231016263
  */
+
+import za.ac.cput.campus_events.domain.Admin;
 import za.ac.cput.campus_events.domain.Faculty;
-import java.time.LocalDateTime;
 
 public class FacultyFactory {
-    public Faculty createFaculty(String name, String status,
-                                 String contactEmail,
-                                 Long createdByAdminId) {
+
+    public static Faculty createFaculty(String name, String status, String contactEmail, Admin createdByAdmin) {
+        if (name == null || name.isEmpty()) return null;
+        if (status == null || status.isEmpty()) return null;
+        if (contactEmail == null || contactEmail.isEmpty()) return null;
+        if (createdByAdmin == null) return null;
+
         return new Faculty.Builder()
-                .name(name)
-                .status(status)
-                .contactEmail(contactEmail)
-                .createdByAdminId(createdByAdminId)
-                .createdAt(LocalDateTime.now())
+                .setName(name)
+                .setStatus(status)
+                .setEmail(contactEmail)
+                .setCreatedByAdmin(createdByAdmin)
                 .build();
     }
 }
