@@ -4,14 +4,20 @@ import jakarta.persistence.*;
 
 @Entity
 public class Venue {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
+
     private Integer capacity;
 
     @Embedded
     private Address address;
+
+    public Venue() {
+    }
 
     private Venue(Builder builder) {
         this.name = builder.name;
@@ -19,33 +25,55 @@ public class Venue {
         this.address = builder.address;
     }
 
-    public Venue() {
-
+    public Long getId() {
+        return id;
     }
 
-    public static class Builder {
-        private String name;
-        private Integer capacity;
-        private Address address;
-
-        public Builder setName(String name) { this.name = name; return this; }
-        public Builder setCapacity(Integer capacity) { this.capacity = capacity; return this; }
-        public Builder setAddress(Address address) { this.address = address; return this; }
-
-        public Venue build() { return new Venue(this); }
+    public String getName() {
+        return name;
     }
 
-    public String getName() { return name; }
-    public Integer getCapacity() { return capacity; }
-    public Address getAddress() { return address; }
+    public Integer getCapacity() {
+        return capacity;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
 
     @Override
     public String toString() {
         return "Venue{" +
+                "id=" + id +
                 ", name='" + name + '\'' +
                 ", capacity=" + capacity +
                 ", address=" + address +
                 '}';
     }
-}
 
+    public static class Builder {
+
+        private String name;
+        private Integer capacity;
+        private Address address;
+
+        public Builder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder setCapacity(Integer capacity) {
+            this.capacity = capacity;
+            return this;
+        }
+
+        public Builder setAddress(Address address) {
+            this.address = address;
+            return this;
+        }
+
+        public Venue build() {
+            return new Venue(this);
+        }
+    }
+}

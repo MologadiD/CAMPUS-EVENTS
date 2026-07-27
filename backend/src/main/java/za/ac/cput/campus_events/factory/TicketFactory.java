@@ -1,22 +1,25 @@
 package za.ac.cput.campus_events.factory;
 
+import za.ac.cput.campus_events.domain.Event;
+import za.ac.cput.campus_events.domain.PromoCode;
+import za.ac.cput.campus_events.domain.Student;
 import za.ac.cput.campus_events.domain.Ticket;
 
 public class TicketFactory {
-    public static Ticket createTicket(Long studentId, Long eventId, Long promoCodeId, Double price) {
+    public static Ticket createTicket(Student student, Event event, PromoCode promoCode, Double price) {
         if(price < 0) {
             return null;
         }
-        if(eventId == null) {
+        if(event == null) {
             return null;
         }
-        if(studentId == null) {
+        if(student == null) {
             return null;
         }
 
        Ticket ouTicket = new Ticket.Builder()
-            .setEventId(eventId)
-            .setPromoCodeId(promoCodeId)
+            .setEvent(event)
+            .setPromoCode(promoCode)
             .setPrice(price)
             .build();
 

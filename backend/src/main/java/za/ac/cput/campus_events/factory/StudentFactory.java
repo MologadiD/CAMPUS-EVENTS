@@ -1,11 +1,12 @@
 package za.ac.cput.campus_events.factory;
 
+import za.ac.cput.campus_events.domain.Faculty;
 import za.ac.cput.campus_events.domain.Student;
 import za.ac.cput.campus_events.util.EmailValidator;
 
 public class StudentFactory {
 
-    public static Student createStudent(String faculty, String firstName, String lastName,
+    public static Student createStudent(Faculty faculty, String firstName, String lastName,
                                         String email, String studentNumber){
 
         if(firstName == null || firstName.length() < 3){

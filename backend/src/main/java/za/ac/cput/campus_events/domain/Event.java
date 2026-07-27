@@ -14,7 +14,7 @@ public class Event {
     private LocalDateTime eventDate;
     private Integer capacity;
     private Boolean open;
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @ManyToOne
     @JoinColumn(name = "venueId", nullable = false)
@@ -31,7 +31,6 @@ public class Event {
         this.eventDate = builder.eventDate;
         this.capacity = builder.capacity;
         this.open = builder.open;
-        this.createdAt = builder.createdAt;
         this.venue = builder.venue;
     }
 
@@ -46,7 +45,6 @@ public class Event {
         private LocalDateTime eventDate;
         private Integer capacity;
         private Boolean open;
-        private LocalDateTime createdAt;
         private Venue venue;
 
         public Builder setTitle(String title) { this.title = title; return this; }
@@ -54,7 +52,6 @@ public class Event {
         public Builder setEventDate(LocalDateTime eventDate) { this.eventDate = eventDate; return this; }
         public Builder setCapacity(Integer capacity) { this.capacity = capacity; return this; }
         public Builder setOpen(Boolean open) { this.open = open; return this; }
-        public Builder setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; return this; }
         public Builder setVenue(Venue venue) { this.venue = venue; return this; }
 
         public Event build() { return new Event(this); }
@@ -64,9 +61,6 @@ public class Event {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     // Getters
     public String getTitle() { return title; }
