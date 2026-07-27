@@ -2,6 +2,8 @@ package za.ac.cput;
 
 import javax.swing.*;
 import java.awt.*;
+import com.formdev.flatlaf.FlatLightLaf;
+
 
 public class Login extends JFrame {
 
@@ -122,7 +124,7 @@ public class Login extends JFrame {
 
     public static void main(String[] args) {
         try {
-            UIManager.setLookAndFeel(new com.formdev.flatlaf.FlatLightLaf());
+            UIManager.setLookAndFeel(new FlatLightLaf());
         } catch (UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }

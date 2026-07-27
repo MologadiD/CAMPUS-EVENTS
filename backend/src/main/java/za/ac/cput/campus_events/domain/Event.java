@@ -17,8 +17,12 @@ public class Event {
     @JoinColumn(name = "venueId", nullable = false)
     private Venue venue;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organiser_id")
+    private Organiser organiser;
+
     // Private constructor for Builder
-    private Event(Builder builder) {
+    public Event(Builder builder) {
         this.title = builder.title;
         this.description = builder.description;
         this.eventDate = builder.eventDate;
@@ -26,6 +30,10 @@ public class Event {
         this.open = builder.open;
         this.createdAt = builder.createdAt;
         this.venue = builder.venue;
+    }
+
+    public Event() {
+
     }
 
     // Builder Pattern
