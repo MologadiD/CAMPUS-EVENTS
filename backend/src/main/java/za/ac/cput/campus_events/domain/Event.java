@@ -5,9 +5,6 @@ import java.time.LocalDateTime;
 
 @Entity
 public class Event {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     private String title;
     private String description;
@@ -61,7 +58,6 @@ public class Event {
     }
 
     // Getters
-    public Long getId() { return id; }
     public String getTitle() { return title; }
     public String getDescription() { return description; }
     public LocalDateTime getEventDate() { return eventDate; }
@@ -73,8 +69,7 @@ public class Event {
     @Override
     public String toString() {
         return "Event{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
+                "title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", eventDate=" + eventDate +
                 ", capacity=" + capacity +
@@ -84,3 +79,4 @@ public class Event {
                 '}';
     }
 }
+

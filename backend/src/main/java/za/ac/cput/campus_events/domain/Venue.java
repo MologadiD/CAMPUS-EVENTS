@@ -4,9 +4,8 @@ import jakarta.persistence.*;
 
 @Entity
 public class Venue {
-    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+
 
     private String name;
     private Integer capacity;
@@ -36,7 +35,6 @@ public class Venue {
         public Venue build() { return new Venue(this); }
     }
 
-    public Long getId() { return id; }
     public String getName() { return name; }
     public Integer getCapacity() { return capacity; }
     public Address getAddress() { return address; }
@@ -44,7 +42,6 @@ public class Venue {
     @Override
     public String toString() {
         return "Venue{" +
-                "id=" + id +
                 ", name='" + name + '\'' +
                 ", capacity=" + capacity +
                 ", address=" + address +
