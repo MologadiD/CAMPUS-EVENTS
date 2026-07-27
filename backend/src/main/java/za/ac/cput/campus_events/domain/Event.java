@@ -5,10 +5,10 @@ import java.time.LocalDateTime;
 
 @Entity
 public class Event {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
     private String title;
     private String description;
     private LocalDateTime eventDate;
@@ -20,8 +20,12 @@ public class Event {
     @JoinColumn(name = "venueId", nullable = false)
     private Venue venue;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organiser_id")
+    private Organiser organiser;
+
     // Private constructor for Builder
-    private Event(Builder builder) {
+    public Event(Builder builder) {
         this.title = builder.title;
         this.description = builder.description;
         this.eventDate = builder.eventDate;
@@ -56,8 +60,15 @@ public class Event {
         public Event build() { return new Event(this); }
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     // Getters
-    public Long getId() { return id; }
     public String getTitle() { return title; }
     public String getDescription() { return description; }
     public LocalDateTime getEventDate() { return eventDate; }
@@ -69,8 +80,7 @@ public class Event {
     @Override
     public String toString() {
         return "Event{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
+                "title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", eventDate=" + eventDate +
                 ", capacity=" + capacity +
@@ -80,3 +90,4 @@ public class Event {
                 '}';
     }
 }
+
