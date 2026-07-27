@@ -37,6 +37,7 @@ public class Event {
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PromoCode> promoCodes = new HashSet<>();
 
+    // Private constructor for Builder
     private Event(Builder builder) {
         this.title = builder.title;
         this.description = builder.description;
@@ -51,6 +52,7 @@ public class Event {
         this.promoCodes = builder.promoCodes;
     }
 
+    // Builder Pattern
     public static class Builder {
         private String title;
         private String description;
