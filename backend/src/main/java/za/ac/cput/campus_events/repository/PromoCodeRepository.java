@@ -13,11 +13,11 @@ public interface PromoCodeRepository extends JpaRepository<PromoCode, String> {
     Optional<PromoCode> findByCode(String code);
 
     @Query("""
-            SELECT COUNT(t) > 0
-            FROM Ticket t
-            WHERE t.studentId = :studentId
-            AND t.promoCodeId = :promoCodeId
-            """)
+        SELECT COUNT(t) > 0
+        FROM Ticket t
+        WHERE t.student.id = :studentId
+        AND t.promoCode.id = :promoCodeId
+        """)
     boolean existsRedemptionByStudentIdAndPromoCodeId(
             @Param("studentId") Long studentId,
             @Param("promoCodeId") Long promoCodeId);

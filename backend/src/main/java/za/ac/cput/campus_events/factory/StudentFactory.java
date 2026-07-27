@@ -5,7 +5,7 @@ import za.ac.cput.campus_events.domain.Student;
 import za.ac.cput.campus_events.util.EmailValidator;
 
 public class StudentFactory {
-
+   // TODO : CHECK PASSWORD
     public static Student createStudent(Faculty faculty, String firstName, String lastName,
                                         String email, String studentNumber){
 

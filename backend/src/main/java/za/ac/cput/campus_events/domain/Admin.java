@@ -17,6 +17,7 @@ public class Admin {
     private String lastName;
     private String email;
     private Date createdAt = new Date();
+    private String password;
 
     public Admin(Builder builder) {
         this.firstName = builder.firstName;
@@ -30,9 +31,15 @@ public class Admin {
         private String firstName;
         private String lastName;
         private String email;
+        private String password;
 
         public Builder setFirstName(String firstName){
             this.firstName = firstName;
+            return this;
+        }
+
+        public Builder setPassword(){
+            this.password = password;
             return this;
         }
 
