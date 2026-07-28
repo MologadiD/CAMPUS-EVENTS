@@ -55,4 +55,15 @@ public class Address {
             return new Address(this);
         }
     }
+
+    @Override
+    public String toString() {
+        return "Address{" +
+                "street='" + street + '\'' +
+                ", suburb='" + suburb + '\'' +
+                ", city='" + city + '\'' +
+                ", postalCode='" + postalCode + '\'' +
+                ", province='" + province + '\'' +
+                '}';
+    }
 }

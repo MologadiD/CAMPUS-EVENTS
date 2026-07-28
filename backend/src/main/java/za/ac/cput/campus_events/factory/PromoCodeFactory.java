@@ -1,6 +1,6 @@
 package za.ac.cput.campus_events.factory;
 
-import za.ac.cput.campus_events.entity.PromoCode;
+import za.ac.cput.campus_events.domain.PromoCode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 

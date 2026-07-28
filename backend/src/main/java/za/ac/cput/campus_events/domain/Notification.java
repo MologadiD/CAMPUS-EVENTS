@@ -16,17 +16,16 @@ public class Notification {
     @Column(nullable = false, length = 1000)
     private String message;
 
-    @Column(nullable = false)
-    private Boolean read;
+    @Column(name = "is_read")
+    private boolean read;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
-/*
-we'll activate them once we have the Student entity
-    //@ManyToOne
-    //@JoinColumn(name = "student_id")
-    //private Student student;
-*/
+
+    @ManyToOne
+    @JoinColumn(name = "student_id")
+    private Student student;
+
     protected Notification() {
     }
 
@@ -58,11 +57,11 @@ we'll activate them once we have the Student entity
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
-/*
+
     public Student getStudent() {
         return student;
     }
-*/
+
     public void markAsRead() {
         this.read = true;
     }
