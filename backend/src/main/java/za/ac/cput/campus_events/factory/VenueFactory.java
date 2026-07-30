@@ -7,22 +7,20 @@ public class VenueFactory {
 
     public static Venue createVenue(String name, Integer capacity, Address address) {
 
-        if (name == null || name.length() < 3) {
+        if (name == null || name.trim().length() < 3) {
             return null;
         }
 
-        if (capacity == null || capacity <= 0) {
-            // TODO : set a sensible maximum capacity
+        if (capacity == null || capacity <= 0 || capacity > 1500) {
             return null;
         }
 
         if (address == null) {
-            // TODO : verify the address exists or is valid
             return null;
         }
 
         return new Venue.Builder()
-                .setName(name)
+                .setName(name.trim())
                 .setCapacity(capacity)
                 .setAddress(address)
                 .build();
