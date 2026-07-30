@@ -34,8 +34,7 @@ public class Event {
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Ticket> tickets = new HashSet<>();
 
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<PromoCode> promoCodes = new HashSet<>();
+
 
     // Private constructor for Builder
     private Event(Builder builder) {
@@ -49,7 +48,10 @@ public class Event {
         this.organiser = builder.organiser;
         this.faculty = builder.faculty;
         this.tickets = builder.tickets;
-        this.promoCodes = builder.promoCodes;
+    }
+
+    public Event() {
+
     }
 
     // Builder Pattern
@@ -93,7 +95,6 @@ public class Event {
     public Organiser getOrganiser() { return organiser; }
     public Faculty getFaculty() { return faculty; }
     public Set<Ticket> getTickets() { return tickets; }
-    public Set<PromoCode> getPromoCodes() { return promoCodes; }
 
     @Override
     public String toString() {
@@ -109,7 +110,6 @@ public class Event {
                 ", organiser=" + (organiser != null ? organiser.getFirstName() : "null") +
                 ", faculty=" + (faculty != null ? faculty.getName() : "null") +
                 ", tickets=" + tickets.size() +
-                ", promoCodes=" + promoCodes.size() +
                 '}';
     }
 }
