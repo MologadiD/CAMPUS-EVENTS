@@ -1,0 +1,80 @@
+# Auth Flow — Spec & Delegation (Thursday / Friday)
+## Assignments
+
+| Person | Owns |
+|---|---|
+| **Tony** | `AuthService` + `AuthController` — `register`, `verify`, `resend` endpoints; OTP generation, PIN check, TTL/expiry logic |
+| **Faith** | All 5 DTOs: `RegisterRequestDTO`, `RegisterResponseDTO`, `VerifyRequestDTO`, `VerifyResponseDTO`, `ResendRequestDTO` |
+| **Mologadi** | `PendingRegistration` entity (Builder pattern) + `PendingRegistrationRepository`; pairs with Uhmar on wiring `Verify.java` to the backend |
+| **Leeroy** | `Register.java` + `Login.java` + OTP-screen wiring (frontend end-to-end); `/auth/login` endpoint |
+| **Uhmar** | New `Verify.java` screen (OTP entry) — PIN field, submit button, resend button. Same purple-panel/BoxLayout pattern as `Login`/`Register`. Wires to the endpoint together with Mologadi, once Tony's `/auth/verify` and `/auth/resend` exist. |
+
+
+## PendingRegistration (Mologadi)
+
+Note : if the Student / Organiser do Not have a password field, add it in now please. Created At and Expires At should not be in the builder, they should be default / auto created values
+
+| Field | Type |
+|---|---|
+| `uuid` | String (PK, generated — not auto-increment) |
+| `email` | String |
+| `password` | String |
+| `role` | String |
+| `facultyId` | Long |
+| `studentNumber` | String, nullable |
+| `pin` | String |
+| `expiresAt` | LocalDateTime |
+| `createdAt` | LocalDateTime |
+
+Builder pattern, same convention as every other entity. `PendingRegistrationRepository extends JpaRepository<PendingRegistration, String>` — note the ID type is `String` (the UUID), not `Long`.
+
+**Factory usage timing:** at register time, call the existing `StudentFactory`/`OrganiserFactory` (already built in Milestone 1) purely to validate — the object it returns is discarded, never saved. At verify time — once PIN + expiry pass — call the same factory again with the fields pulled off the matched `PendingRegistration` row to build the real object, and that one gets saved.
+
+**New repo method needed:** `existsByEmail(String Email)` on both `StudentRepository` and `OrganiserRepository`, for the duplicate check in `register()`. Plain method, not Query by Example against a whole object — matching the full candidate would treat two signups with the same username but different faculty/password as different people.
+
+---
+
+## DTOs (Faith)
+
+```java
+RegisterRequestDTO   { role, email, password, facultyId, studentNumber (nullable) }
+RegisterResponseDTO  { success, message, uuid, email, pin }
+VerifyRequestDTO      { uuid, pin }
+VerifyResponseDTO     { success, message, accountId, role }
+ResendRequestDTO       { uuid }
+```
+
+`pin` in `RegisterResponseDTO` is dev-mode only — flag with a comment, it's standing in for real email delivery.
+
+---
+
+## AuthService / AuthController (Tony)
+
+### `register(RegisterRequestDTO)`
+1. Call `StudentFactory.createStudent(...)` / `OrganiserFactory.createOrganiser(...)` with the DTO's fields, purely as validation — same "return null on failure" convention as always. This is *not* saved; it's built, checked, and discarded.
+2. If the factory returned `null` → `RegisterResponseDTO { success=false, message="Invalid registration details" }`.
+3. Else, check `existsByUsername(email)` on `StudentRepository`/`OrganiserRepository` (whichever matches role) — a new plain method, not Query by Example, not a match against the whole candidate object (faculty/password would make near-identical signups look like different people).
+4. If it already exists → `RegisterResponseDTO { success=false, message="Username already taken" }`.
+5. Both pass → copy the fields off the (discarded) candidate object into a new `PendingRegistration` with a generated `uuid` + `pin` + `expiresAt`, save it, return `RegisterResponseDTO { success=true, uuid, email, pin }`.
+
+### `verify(VerifyRequestDTO)`
+1. Look up `PendingRegistration` by `uuid`.
+2. Expired → `VerifyResponseDTO { success=false, message="expired" }` (distinct message — frontend shows Resend, not just a generic error).
+3. Wrong PIN → `VerifyResponseDTO { success=false, message="incorrect code" }`.
+4. Match → create real `Student`/`Organiser` row, delete the pending row, return `VerifyResponseDTO { success=true, accountId, role }`.
+
+
+---
+
+## Login endpoint (Leeroy)
+
+`POST /auth/login` — takes role + email + password, checks against `StudentRepository`/`OrganiserRepository`/`AdminRepository`'s `findByEmailAndPassword` depending on role. If the `Admin` result has `mustChangePassword == true`, response should signal that so the frontend redirects to change-password instead of the dashboard.
+
+---
+
+## Verify screen (Uhmar)
+
+New file, `Verify.java`. Fields: PIN entry, "Verify" button, "Resend code" button (visible always, or only after an expiry response — pick whichever's simpler to ship today). Holds the `uuid` passed in from `Register.java` when it opens this screen. Same visual pattern as `Login`/`Register` — purple panel, `BoxLayout` form side, centered.
+
+---
+

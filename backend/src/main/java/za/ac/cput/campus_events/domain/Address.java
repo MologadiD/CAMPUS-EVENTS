@@ -19,6 +19,26 @@ public class Address {
     }
     public Address(){}
 
+    public String getStreet() {
+        return street;
+    }
+
+    public String getSuburb() {
+        return suburb;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
     public static class Builder{
         private String street;
         private String suburb;
