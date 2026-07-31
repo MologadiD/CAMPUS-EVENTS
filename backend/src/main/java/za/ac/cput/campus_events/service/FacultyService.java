@@ -1,7 +1,8 @@
 package za.ac.cput.campus_events.service;
+
 /*
-Mologadi Dikgale
-Student No: 231016263
+ * Mologadi Dikgale
+ * Student No: 231016263
  */
 
 import org.springframework.stereotype.Service;
@@ -38,6 +39,19 @@ public class FacultyService implements IFacultyService {
     @Override
     public void deleteById(Long id) {
         facultyRepository.deleteById(id);
+    }
+
+    @Override
+    public void deactivate(Long facultyId) {
+        // Optional<Faculty> facultyOptional = facultyRepository.findById(facultyId);
+
+        // if (facultyOptional.isPresent()) {
+        //     Faculty faculty = facultyOptional.get();
+        //     faculty.setStatus("Inactive");
+        //     facultyRepository.save(faculty);
+        // } else {
+        //     throw new RuntimeException("Faculty not found with id: " + facultyId);
+        // }
     }
 
     @Override
