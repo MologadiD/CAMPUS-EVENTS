@@ -1,10 +1,5 @@
 package za.ac.cput.campus_events.service;
 
-/*
- * Mologadi Dikgale
- * Student No: 231016263
- */
-
 import org.springframework.stereotype.Service;
 import za.ac.cput.campus_events.domain.Faculty;
 import za.ac.cput.campus_events.repository.FacultyRepository;
@@ -59,3 +54,4 @@ public class FacultyService implements IFacultyService {
         return facultyRepository.findByStatus(status);
     }
 }
+ 41d2e40d9ee4bc2c2de7f81c9efb60eb9b7b7f91

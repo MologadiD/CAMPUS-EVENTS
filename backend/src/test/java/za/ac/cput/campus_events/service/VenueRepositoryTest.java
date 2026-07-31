@@ -25,6 +25,7 @@ class VenueServiceTest {
     @InjectMocks
     private VeneuService venueService;
 
+
     private Venue venue;
 
     @BeforeEach
