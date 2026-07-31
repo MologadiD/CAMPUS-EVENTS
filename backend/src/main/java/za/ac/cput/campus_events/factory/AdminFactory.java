@@ -16,7 +16,7 @@ public class AdminFactory {
             return null;
         }
 
-        if(EmailValidator.isValid(email)){
+        if(!EmailValidator.isValid(email)){
             return null;
         }
 
