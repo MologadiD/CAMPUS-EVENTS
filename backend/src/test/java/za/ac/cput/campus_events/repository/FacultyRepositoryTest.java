@@ -18,8 +18,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+class FacultyRepositoryTest {
 
-public class FacultyRepositoryTest {
     @Mock
     private FacultyRepository facultyRepository;
 
@@ -28,11 +28,11 @@ public class FacultyRepositoryTest {
     @BeforeEach
     void setUp() {
         faculty = new Faculty.Builder()
-                .name("Faculty of Engineering")
-                .status("ACTIVE")
-                .contactEmail("engineering@cput.ac.za")
-                .createdByAdminId(1L)
-                .createdAt(LocalDateTime.now())
+                .setName("Faculty of Engineering")
+                .setStatus("ACTIVE")
+                .setContactEmail("engineering@cput.ac.za")
+                .setCreatedByAdminId(1L)
+                .setCreatedAt(LocalDateTime.now())
                 .build();
     }
 

@@ -19,6 +19,10 @@ public class Address {
     }
     public Address(){}
 
+    public String getCity() {
+        return "";
+    }
+
     public static class Builder{
         private String street;
         private String suburb;

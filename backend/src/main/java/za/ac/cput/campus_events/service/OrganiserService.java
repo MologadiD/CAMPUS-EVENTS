@@ -19,15 +19,15 @@ import java.util.Optional;
 public class OrganiserService implements IOrganiserService {
 
     private final OrganiserRepository organiserRepository;
-    private final FacultyRepository   facultyRepository;
-    private final EventRepository     eventRepository;
+    private final FacultyRepository facultyRepository;
+    private final EventRepository eventRepository;
 
     public OrganiserService(OrganiserRepository organiserRepository,
                             FacultyRepository facultyRepository,
                             EventRepository eventRepository) {
         this.organiserRepository = organiserRepository;
-        this.facultyRepository   = facultyRepository;
-        this.eventRepository     = eventRepository;
+        this.facultyRepository = facultyRepository;
+        this.eventRepository = eventRepository;
     }
 
     @Override
@@ -53,76 +53,58 @@ public class OrganiserService implements IOrganiserService {
     @Override
     public Organiser registerOrganiser(Organiser organiser, Long facultyId) {
         Faculty faculty = facultyRepository.findById(facultyId)
-                .orElseThrow(() -> new RuntimeException(
-                        "Faculty not found with id: " + facultyId));
+                .orElseThrow(() -> new RuntimeException("Faculty not found with id: " + facultyId)).getFaculty();
 
         if (!faculty.getStatus().equalsIgnoreCase("ACTIVE")) {
-            throw new RuntimeException(
-                    "Cannot register organiser — faculty is not ACTIVE");
+            throw new RuntimeException("Cannot register organiser — faculty is not ACTIVE");
         }
 
+        organiser.setFaculty(faculty); // assuming Organiser has a Faculty field
         return organiserRepository.save(organiser);
     }
-
 
     @Override
     public Event createEvent(Long organiserId, Event event) {
         Organiser organiser = organiserRepository.findById(organiserId)
-                .orElseThrow(() -> new RuntimeException(
-                        "Organiser not found with id: " + organiserId));
+                .orElseThrow(() -> new RuntimeException("Organiser not found with id: " + organiserId));
 
-        Faculty faculty = facultyRepository.findById(organiser.getId())
-                .orElseThrow(() -> new RuntimeException(
-                        "Faculty not found for organiser: " + organiserId));
-
-        if (!faculty.getStatus().equalsIgnoreCase("ACTIVE")) {
-            throw new RuntimeException(
-                    "Cannot create event — faculty is not ACTIVE");
+        Faculty faculty = organiser.getFaculty(); // FIXED: use organiser’s faculty
+        if (faculty == null || !faculty.getStatus().equalsIgnoreCase("ACTIVE")) {
+            throw new RuntimeException("Cannot create event — faculty is not ACTIVE");
         }
 
+        event.setOrganiser(organiser); // assuming Event has an organiser field
         return eventRepository.save(event);
     }
 
     @Override
     public Event updateEvent(Long organiserId, Event event) {
         Organiser organiser = organiserRepository.findById(organiserId)
-                .orElseThrow(() -> new RuntimeException(
-                        "Organiser not found with id: " + organiserId));
+                .orElseThrow(() -> new RuntimeException("Organiser not found with id: " + organiserId));
 
-        Faculty faculty = facultyRepository.findById(organiser.getId())
-                .orElseThrow(() -> new RuntimeException(
-                        "Faculty not found for organiser: " + organiserId));
-
-        if (!faculty.getStatus().equalsIgnoreCase("ACTIVE")) {
-            throw new RuntimeException(
-                    "Cannot update event — faculty is not ACTIVE");
+        Faculty faculty = organiser.getFaculty(); // FIXED
+        if (faculty == null || !faculty.getStatus().equalsIgnoreCase("ACTIVE")) {
+            throw new RuntimeException("Cannot update event — faculty is not ACTIVE");
         }
 
+        event.setOrganiser(organiser);
         return eventRepository.save(event);
     }
 
     @Override
     public void closeEvent(Long organiserId, Long eventId) {
         Organiser organiser = organiserRepository.findById(organiserId)
-                .orElseThrow(() -> new RuntimeException(
-                        "Organiser not found with id: " + organiserId));
+                .orElseThrow(() -> new RuntimeException("Organiser not found with id: " + organiserId));
 
-        Faculty faculty = facultyRepository.findById(organiser.getId())
-                .orElseThrow(() -> new RuntimeException(
-                        "Faculty not found for organiser: " + organiserId));
-
-        if (!faculty.getStatus().equalsIgnoreCase("ACTIVE")) {
-            throw new RuntimeException(
-                    "Cannot close event — faculty is not ACTIVE");
+        Faculty faculty = organiser.getFaculty(); // FIXED
+        if (faculty == null || !faculty.getStatus().equalsIgnoreCase("ACTIVE")) {
+            throw new RuntimeException("Cannot close event — faculty is not ACTIVE");
         }
 
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException(
-                        "Event not found with id: " + eventId));
+                .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
 
-        event.closeRegistration();
+        event.closeRegistration(); // assuming Event has this method
         eventRepository.save(event);
     }
-
-
 }
