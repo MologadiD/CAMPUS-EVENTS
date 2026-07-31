@@ -58,6 +58,13 @@ public class Organiser {
                 '}';
     }
 
+    public Faculty getFaculty() {
+        return null;
+    }
+
+    public void setFaculty(Faculty faculty) {
+    }
+
     public static class Builder {
         private Long          id;
         private String        firstName;

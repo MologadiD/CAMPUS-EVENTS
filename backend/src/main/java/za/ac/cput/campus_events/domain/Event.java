@@ -1,6 +1,8 @@
 package za.ac.cput.campus_events.domain;
 
 import jakarta.persistence.*;
+import org.springframework.web.ErrorResponse;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -54,6 +56,32 @@ public class Event {
 
     }
 
+    public void closeRegistration() {
+    }
+
+    public void setOrganiser(Organiser organiser) {
+    }
+
+    public void setCapacity(int i) {
+    }
+
+
+    public void setOpen(boolean b) {
+    }
+
+    public void closeRegistration() {
+    }
+
+    public void setOrganiser(Organiser organiser) {
+    }
+
+    public void setCapacity(int i) {
+    }
+
+
+    public void setOpen(boolean b) {
+    }
+
     // Builder Pattern
     public static class Builder {
         private String title;
@@ -81,6 +109,10 @@ public class Event {
         public Builder setPromoCodes(Set<PromoCode> promoCodes) { this.promoCodes = promoCodes; return this; }
 
         public Event build() { return new Event(this); }
+
+        public ErrorResponse.Builder id(Long id) {
+            return null;
+        }
     }
 
     // Getters

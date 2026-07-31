@@ -8,6 +8,7 @@ import za.ac.cput.campus_events.domain.Organiser;
 import java.util.List;
 
 @Repository
-public interface FacultyRepository extends JpaRepository<Faculty, Long> {
+
+public interface FacultyRepository extends JpaRepository<Organiser, Long> {
     List<Faculty> findByStatus(String status);
 }
