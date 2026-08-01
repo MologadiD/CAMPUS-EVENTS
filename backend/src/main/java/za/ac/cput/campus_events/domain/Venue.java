@@ -2,6 +2,8 @@ package za.ac.cput.campus_events.domain;
 
 import jakarta.persistence.*;
 
+import java.util.Vector;
+
 @Entity
 public class Venue {
 
@@ -53,7 +55,7 @@ public class Venue {
 
     public static class Builder {
 
-        private String name;
+        public String name;
         private Integer capacity;
         private Address address;
 
@@ -74,6 +76,10 @@ public class Venue {
 
         public Venue build() {
             return new Venue(this);
+        }
+
+        public Vector<Object> name() {
+            return null;
         }
     }
 }

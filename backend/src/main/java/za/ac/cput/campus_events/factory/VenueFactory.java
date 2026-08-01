@@ -7,6 +7,7 @@ public class VenueFactory {
 
     public static Venue createVenue(String name, Integer capacity, Address address) {
 
+
         if (name == null || name.trim().length() < 3) {
             return null;
         }
