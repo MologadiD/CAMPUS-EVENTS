@@ -12,6 +12,7 @@ import za.ac.cput.campus_events.repository.OrganiserRepository;
 import za.ac.cput.campus_events.repository.PendingRegistrationRepository;
 import za.ac.cput.campus_events.repository.StudentRepository;
 
+import java.time.LocalDateTime;
 import java.util.Random;
 
 @Service
@@ -70,7 +71,7 @@ public class AuthService {
         response.setUuid(pendingRegistration.getUuid());
         response.setEmail(pendingRegistration.getEmail());
 
-        // DEV MODE ONLY
+        // DEV MODE ONLY - Later On
         response.setPin(pin);
 
         return response;
@@ -138,7 +139,9 @@ public class AuthService {
 
         RegisterResponseDTO response = new RegisterResponseDTO();
 
-        if (request == null || request.getUuid() == null || request.getUuid().isBlank()) {
+        if (request == null
+                || request.getUuid() == null
+                || request.getUuid().isBlank()) {
 
             response.setSuccess(false);
             response.setMessage("Invalid resend request.");
@@ -158,22 +161,16 @@ public class AuthService {
 
         String newPin = generatePin();
 
-        PendingRegistration updated =
-                new PendingRegistration.Builder()
-                        .setEmail(pendingRegistration.getEmail())
-                        .setPassword(pendingRegistration.getPassword())
-                        .setRole(pendingRegistration.getRole())
-                        .setFacultyId(pendingRegistration.getFacultyId())
-                        .setStudentNumber(pendingRegistration.getStudentNumber())
-                        .setPin(newPin)
-                        .build();
+        // Update the existing registration
+        pendingRegistration.setPin(newPin);
+        pendingRegistration.setExpiresAt(LocalDateTime.now().plusMinutes(10));
 
-        pendingRegistrationRepository.save(updated);
+        pendingRegistrationRepository.save(pendingRegistration);
 
         response.setSuccess(true);
         response.setMessage("New PIN generated.");
-        response.setUuid(updated.getUuid());
-        response.setEmail(updated.getEmail());
+        response.setUuid(pendingRegistration.getUuid());
+        response.setEmail(pendingRegistration.getEmail());
 
         // DEV MODE ONLY
         response.setPin(newPin);

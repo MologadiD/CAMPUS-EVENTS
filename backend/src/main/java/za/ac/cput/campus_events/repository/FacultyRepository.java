@@ -9,6 +9,7 @@ import java.util.List;
 
 @Repository
 
-public interface FacultyRepository extends JpaRepository<Organiser, Long> {
+public interface FacultyRepository extends JpaRepository<Faculty, Long> {
     List<Faculty> findByStatus(String status);
+    List<Faculty> findAll();
 }

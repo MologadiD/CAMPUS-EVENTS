@@ -38,7 +38,7 @@ public class Admin {
             return this;
         }
 
-        public Builder setPassword(){
+        public Builder setPassword(String password){
             this.password = password;
             return this;
         }
@@ -58,9 +58,30 @@ public class Admin {
         public Admin build(){
             return new Admin(this);
         }
+    }
 
+    public Long getId() {
+        return id;
+    }
 
+    public String getFirstName() {
+        return firstName;
+    }
 
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     @Override

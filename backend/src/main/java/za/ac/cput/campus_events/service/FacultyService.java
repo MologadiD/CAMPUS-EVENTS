@@ -53,5 +53,24 @@ public class FacultyService implements IFacultyService {
     public List<Faculty> findByStatus(String status) {
         return facultyRepository.findByStatus(status);
     }
+
+    @Override
+    public <T> T create(T t) {
+        return null;
+    }
+
+    @Override
+    public <T> T read(Long id) {
+        return null;
+    }
+
+    @Override
+    public <T> T update(T t) {
+        return null;
+    }
+
+    @Override
+    public <T> void delete(T t) {
+
+    }
 }
- 41d2e40d9ee4bc2c2de7f81c9efb60eb9b7b7f91
