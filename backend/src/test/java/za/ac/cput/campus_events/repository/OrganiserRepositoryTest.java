@@ -28,11 +28,10 @@ public class OrganiserRepositoryTest {
     @BeforeEach
     void setUp() {
         organiser = new Organiser.Builder()
-                .firstName("John")
-                .lastName("Smith")
-                .email("john@cput.ac.za")
-                .role("EVENT_COORDINATOR")
-                .createdAt(LocalDateTime.now())
+                .setFirstName("John")
+                .setLastName("Smith")
+                .setEmail("john@cput.ac.za")
+                .setRole("EVENT_COORDINATOR")
                 .build();
     }
 

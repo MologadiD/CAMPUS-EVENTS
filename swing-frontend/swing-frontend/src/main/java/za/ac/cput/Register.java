@@ -2,7 +2,15 @@ package za.ac.cput;
 
 import javax.swing.*;
 import java.awt.*;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.formdev.flatlaf.FlatLightLaf;
+import za.ac.cput.DTO.*;
+
 
 public class Register extends JFrame {
 
@@ -173,6 +181,18 @@ public class Register extends JFrame {
             new Login().setVisible(true);
             this.dispose();
         });
+
+        btnRegister.addActionListener(e -> {
+            RegisterRequestDTO request = new RegisterRequestDTO();
+
+            request.setRole("STUDENT");
+            request.setEmail(txtEmail.getText().trim());
+            request.setPassword(new String("mypassword"));
+            request.setFacultyId(44L);
+            request.setStudentNumber(txtStudentNumber.getText().trim());
+
+            register(request);
+        });
     }
 
     private JPanel buildStudentFieldsPanel() {
@@ -186,12 +206,13 @@ public class Register extends JFrame {
 
         return panel;
     }
-
     private JPanel buildOrganiserFieldsPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        lblPendingNotice = new JLabel("Pending organiser approval.");
+        lblPendingNotice.setFont(LABEL_FONT);
         lblPendingNotice.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         panel.add(labeledRow("Faculty", cmbFacultyOrganiser));
@@ -200,7 +221,6 @@ public class Register extends JFrame {
 
         return panel;
     }
-
     // label : input, side by side on one line
     private JPanel labeledRow(String labelText, JComponent field) {
         JPanel row = new JPanel();
@@ -219,6 +239,201 @@ public class Register extends JFrame {
         row.add(Box.createHorizontalStrut(10));
         row.add(field);
         return row;
+    }
+
+    public void register(RegisterRequestDTO request) {
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            HttpClient client = HttpClient.newHttpClient();
+
+            // ---------------- REGISTER ----------------
+
+            HttpRequest registerRequest = HttpRequest.newBuilder()
+                    .uri(new URI("http://localhost:8080/api/auth/register"))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(
+                            mapper.writeValueAsString(request)))
+                    .build();
+
+            HttpResponse<String> registerResponse =
+                    client.send(registerRequest, HttpResponse.BodyHandlers.ofString());
+
+            System.out.println("Status: " + registerResponse.statusCode());
+            System.out.println(registerResponse.body());
+
+            if (registerResponse.statusCode() != 200) {
+                JOptionPane.showMessageDialog(
+                        null,
+                        registerResponse.body(),
+                        "Server Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            RegisterResponseDTO registerResult =
+                    mapper.readValue(registerResponse.body(), RegisterResponseDTO.class);
+
+            if (!registerResult.isSuccess()) {
+                JOptionPane.showMessageDialog(
+                        null,
+                        registerResult.getMessage(),
+                        "Registration Failed",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            String uuid = registerResult.getUuid();
+
+            // ---------------- VERIFY ----------------
+
+            while (true) {
+
+                String pin = JOptionPane.showInputDialog(
+                        null,
+                        "Enter the verification PIN sent to your email:",
+                        "Verify Account",
+                        JOptionPane.PLAIN_MESSAGE
+                );
+
+                if (pin == null) {
+                    return;
+                }
+
+                VerifyRequestDTO verifyRequest = new VerifyRequestDTO();
+                verifyRequest.setUuid(uuid);
+                verifyRequest.setPin(pin);
+
+                HttpRequest httpVerifyRequest = HttpRequest.newBuilder()
+                        .uri(new URI("http://localhost:8080/api/auth/verify"))
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(
+                                mapper.writeValueAsString(verifyRequest)))
+                        .build();
+
+                HttpResponse<String> verifyResponse =
+                        client.send(httpVerifyRequest, HttpResponse.BodyHandlers.ofString());
+
+                if (verifyResponse.statusCode() != 200) {
+                    JOptionPane.showMessageDialog(
+                            null,
+                            verifyResponse.body(),
+                            "Server Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    return;
+                }
+
+                VerifyResponseDTO verifyResult =
+                        mapper.readValue(verifyResponse.body(), VerifyResponseDTO.class);
+
+                if (verifyResult.isSuccess()) {
+                    JOptionPane.showMessageDialog(
+                            null,
+                            verifyResult.getMessage(),
+                            "Success",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+                    return;
+                }
+
+                String message = verifyResult.getMessage();
+
+                // Wrong PIN -> Retry
+                if ("Incorrect PIN.".equalsIgnoreCase(message)) {
+
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Incorrect PIN. Please try again.",
+                            "Verification Failed",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+
+                    continue;
+                }
+
+                // PIN expired -> Resend
+                if ("Verification PIN has expired.".equalsIgnoreCase(message)) {
+
+                    int option = JOptionPane.showConfirmDialog(
+                            null,
+                            "Your PIN has expired.\nWould you like a new one?",
+                            "PIN Expired",
+                            JOptionPane.YES_NO_OPTION
+                    );
+
+                    if (option != JOptionPane.YES_OPTION) {
+                        return;
+                    }
+
+                    ResendRequestDTO resendRequest = new ResendRequestDTO();
+                    resendRequest.setUuid(uuid);
+
+                    HttpRequest resendHttpRequest = HttpRequest.newBuilder()
+                            .uri(new URI("http://localhost:8080/api/auth/resend"))
+                            .header("Content-Type", "application/json")
+                            .POST(HttpRequest.BodyPublishers.ofString(
+                                    mapper.writeValueAsString(resendRequest)))
+                            .build();
+
+                    HttpResponse<String> resendResponse =
+                            client.send(resendHttpRequest, HttpResponse.BodyHandlers.ofString());
+
+                    if (resendResponse.statusCode() != 200) {
+                        JOptionPane.showMessageDialog(
+                                null,
+                                resendResponse.body(),
+                                "Server Error",
+                                JOptionPane.ERROR_MESSAGE
+                        );
+                        return;
+                    }
+
+                    RegisterResponseDTO resendResult =
+                            mapper.readValue(resendResponse.body(), RegisterResponseDTO.class);
+
+                    if (!resendResult.isSuccess()) {
+                        JOptionPane.showMessageDialog(
+                                null,
+                                resendResult.getMessage(),
+                                "Resend Failed",
+                                JOptionPane.ERROR_MESSAGE
+                        );
+                        return;
+                    }
+
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "A new PIN has been generated.\nPlease check your email.",
+                            "PIN Sent",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+
+                    continue;
+                }
+
+                JOptionPane.showMessageDialog(
+                        null,
+                        message,
+                        "Verification Failed",
+                        JOptionPane.ERROR_MESSAGE
+                );
+
+                return;
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Unable to communicate with the server.\n\n" + ex.getMessage(),
+                    "Connection Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
     }
 
     public static void main(String[] args) {

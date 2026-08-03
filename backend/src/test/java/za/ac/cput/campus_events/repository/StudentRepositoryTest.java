@@ -28,13 +28,10 @@ public class StudentRepositoryTest {
     @BeforeEach
     void setUp() {
         student = new Student.Builder()
-                .firstName("Jane")
-                .lastName("Doe")
-                .email("jane@cput.ac.za")
-                .studentNumber("220123456")
-                .verificationStatus("PENDING")
-                .facultyId(1L)
-                .createdAt(LocalDateTime.now())
+                .setFirstName("Jane")
+                .setLastName("Doe")
+                .setEmail("jane@cput.ac.za")
+                .setStudentNumber("220123456")
                 .build();
     }
 
@@ -113,15 +110,7 @@ public class StudentRepositoryTest {
         assertEquals(1, result.size());
     }
 
-    @Test
-    void testFindByVerificationStatus_ShouldReturnList() {
-        when(studentRepository.findByVerificationStatus("PENDING"))
-                .thenReturn(List.of(student));
-        List<Student> result = studentRepository.findByVerificationStatus("PENDING");
-        assertNotNull(result);
-        assertEquals(1, result.size());
-      //  assertEquals("PENDING", result.get(0).getVerificationStatus());
-    }
+
 
 
 }

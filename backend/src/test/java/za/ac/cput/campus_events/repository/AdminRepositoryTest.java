@@ -28,10 +28,10 @@ public class AdminRepositoryTest {
     @BeforeEach
     void setUp() {
         admin = new Admin.Builder()
-                .firstName("Peter")
-                .lastName("Jones")
-                .email("peter@cput.ac.za")
-                .createdAt(LocalDateTime.now())
+                .setFirstName("Peter")
+                .setLastName("Jones")
+                .setEmail("peter@cput.ac.za")
+                .setPassword("mycputpeter")
                 .build();
     }
 
