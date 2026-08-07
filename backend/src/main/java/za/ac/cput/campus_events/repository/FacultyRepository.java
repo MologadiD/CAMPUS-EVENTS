@@ -10,8 +10,5 @@ import java.util.Optional;
 @Repository
 
 public interface FacultyRepository extends JpaRepository<Faculty, Long> {
-    Optional<Faculty> findByName(String name);
-    List<Faculty> findByStatus(String status);
-    List<Faculty> findByActive(boolean active);
     List<Faculty> findAll();
 }

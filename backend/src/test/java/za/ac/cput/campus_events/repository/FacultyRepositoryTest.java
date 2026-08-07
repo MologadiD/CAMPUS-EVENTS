@@ -32,7 +32,6 @@ class FacultyRepositoryTest {
 
         faculty = new Faculty.Builder()
                 .setName("Faculty of Engineering")
-                .setStatus("ACTIVE")
                 .setEmail("engineering@cput.ac.za")
                 .setCreatedByAdmin(admin)
                 .build();
@@ -76,20 +75,6 @@ class FacultyRepositoryTest {
         verify(facultyRepository, times(1)).deleteById(1L);
     }
 
-    @Test
-    void testFindByStatus_ActiveStatus_ShouldReturnList() {
-        when(facultyRepository.findByStatus("ACTIVE")).thenReturn(List.of(faculty));
-        List<Faculty> result = facultyRepository.findByStatus("ACTIVE");
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals("ACTIVE", result.get(0).getStatus());
-    }
 
-    @Test
-    void testFindByStatus_InactiveStatus_ShouldReturnEmptyList() {
-        when(facultyRepository.findByStatus("INACTIVE")).thenReturn(List.of());
-        List<Faculty> result = facultyRepository.findByStatus("INACTIVE");
-        assertNotNull(result);
-        assertEquals(0, result.size());
-    }
+
 }

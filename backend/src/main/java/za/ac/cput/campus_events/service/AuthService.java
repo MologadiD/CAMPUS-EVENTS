@@ -1,5 +1,5 @@
 package za.ac.cput.campus_events.service;
-
+import za.ac.cput.campus_events.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.ac.cput.campus_events.DTO.RegisterRequestDTO;
@@ -11,7 +11,6 @@ import za.ac.cput.campus_events.domain.PendingRegistration;
 import za.ac.cput.campus_events.repository.OrganiserRepository;
 import za.ac.cput.campus_events.repository.PendingRegistrationRepository;
 import za.ac.cput.campus_events.repository.StudentRepository;
-
 import java.time.LocalDateTime;
 import java.util.Random;
 
@@ -21,15 +20,17 @@ public class AuthService {
     private final PendingRegistrationRepository pendingRegistrationRepository;
     private final StudentRepository studentRepository;
     private final OrganiserRepository organiserRepository;
+    private final EmailService emailService;
 
     @Autowired
     public AuthService(PendingRegistrationRepository pendingRegistrationRepository,
                        StudentRepository studentRepository,
-                       OrganiserRepository organiserRepository) {
+                       OrganiserRepository organiserRepository,EmailService emailService) {
 
         this.pendingRegistrationRepository = pendingRegistrationRepository;
         this.studentRepository = studentRepository;
         this.organiserRepository = organiserRepository;
+        this.emailService = emailService;
     }
 
     /**
@@ -42,17 +43,54 @@ public class AuthService {
 
         RegisterResponseDTO response = new RegisterResponseDTO();
 
-        if (request == null
-                || request.getEmail() == null || request.getEmail().isBlank()
-                || request.getPassword() == null || request.getPassword().isBlank()
-                || request.getRole() == null || request.getRole().isBlank()) {
-
+        if (request == null || request.getEmail() == null || request.getEmail().isBlank() || request.getPassword() == null || request.getPassword().isBlank() || request.getRole() == null || request.getRole().isBlank()) {
             response.setSuccess(false);
             response.setMessage("Invalid registration details.");
             return response;
         }
+        // Check if student email already exists
+        if (studentRepository.findByEmail(request.getEmail()).isPresent()) {
+            response.setSuccess(false);
+            response.setMessage("A student account with this email already exists.");
+            return response;
+        }
+
+        // Check if organiser email already exists
+        if (organiserRepository.findByEmail(request.getEmail()).isPresent()) {
+            response.setSuccess(false);
+            response.setMessage("An organiser account with this email already exists.");
+            return response;
+        }
+
+        // Check if there is already a pending registration
+        // If the previous registration has expired, it automatically deletes it and lets the user register again.
+        PendingRegistration existingPending =
+                pendingRegistrationRepository.findByEmail(request.getEmail()).orElse(null);
+
+        if (existingPending != null) {
+
+            if (existingPending.isExpired()) {
+                pendingRegistrationRepository.delete(existingPending);
+            } else {
+                response.setSuccess(false);
+                response.setMessage("A verification request for this email already exists.");
+                return response;
+            }
+        }
+
+        // Student numbers must also be unique
+        if ("STUDENT".equalsIgnoreCase(request.getRole())
+                && request.getStudentNumber() != null
+                && !request.getStudentNumber().isBlank()
+                && studentRepository.findByStudentNumber(request.getStudentNumber()).isPresent()) {
+
+            response.setSuccess(false);
+            response.setMessage("Student number is already registered.");
+            return response;
+        }
 
         String pin = generatePin();
+
 
         PendingRegistration pendingRegistration =
                 new PendingRegistration.Builder()
@@ -66,14 +104,16 @@ public class AuthService {
 
         pendingRegistrationRepository.save(pendingRegistration);
 
+
+        pendingRegistrationRepository.save(pendingRegistration);
+
+        emailService.sendVerificationEmail(
+                pendingRegistration.getEmail(),
+                pin
+        );
+
         response.setSuccess(true);
         response.setMessage("Registration successful. Please verify your account.");
-        response.setUuid(pendingRegistration.getUuid());
-        response.setEmail(pendingRegistration.getEmail());
-
-        // DEV MODE ONLY - Later On
-        response.setPin(pin);
-
         return response;
     }
 
@@ -166,14 +206,15 @@ public class AuthService {
         pendingRegistration.setExpiresAt(LocalDateTime.now().plusMinutes(10));
 
         pendingRegistrationRepository.save(pendingRegistration);
+        pendingRegistrationRepository.save(pendingRegistration);
+
+        emailService.sendVerificationEmail(
+                pendingRegistration.getEmail(),
+                newPin
+        );
 
         response.setSuccess(true);
         response.setMessage("New PIN generated.");
-        response.setUuid(pendingRegistration.getUuid());
-        response.setEmail(pendingRegistration.getEmail());
-
-        // DEV MODE ONLY
-        response.setPin(newPin);
 
         return response;
     }

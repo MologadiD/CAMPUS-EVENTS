@@ -1,17 +1,48 @@
 package za.ac.cput;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-    public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+import javax.swing.*;
+import com.formdev.flatlaf.FlatLightLaf;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+public class Main {
+
+    static final String BASE_URL = "http://localhost:8080";
+
+    public static void main(String[] args) {
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
         }
+
+        SwingUtilities.invokeLater(() -> {
+            boolean initialized;
+            try {
+                HttpClient client = HttpClient.newHttpClient();
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(BASE_URL + "/admin/system-status"))
+                        .GET()
+                        .build();
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                JsonNode json = new ObjectMapper().readTree(response.body());
+                initialized = json.path("initialized").asBoolean(false);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null,
+                        "Could not reach the backend. Is the Spring Boot app running?",
+                        "Connection error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (initialized) {
+                new Login().setVisible(true);
+            } else {
+                new CreateFirstAdmin().setVisible(true);
+            }
+        });
     }
 }

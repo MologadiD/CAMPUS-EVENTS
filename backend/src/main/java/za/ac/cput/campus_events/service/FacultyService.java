@@ -50,10 +50,6 @@ public class FacultyService implements IFacultyService {
         // }
     }
 
-    @Override
-    public List<Faculty> findByStatus(String status) {
-        return facultyRepository.findByStatus(status);
-    }
 
     @Override
     public <T> T create(T t) {
