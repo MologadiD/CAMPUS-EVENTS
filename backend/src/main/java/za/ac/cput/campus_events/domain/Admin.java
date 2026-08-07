@@ -23,6 +23,7 @@ public class Admin {
         this.firstName = builder.firstName;
         this.lastName = builder.lastName;
         this.email = builder.email;
+        this.password = builder.password;
     }
 
     public Admin(){}
@@ -44,14 +45,13 @@ public class Admin {
         }
 
         public Builder setLastName(String lastName){
-            this.lastName = Builder.this.lastName;
+            this.lastName = lastName;
             return this;
         }
 
         public Builder setEmail(String email){
-            this.email = Builder.this.email;
+            this.email = email;
             return this;
-
 
         }
 

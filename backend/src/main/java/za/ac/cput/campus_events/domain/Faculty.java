@@ -37,8 +37,6 @@ public class Faculty {
         this.createdByAdmin = builder.createdByAdmin;
     }
 
-    // immutable status change — same id, everything else copied as-is, only
-    // `active` differs. Save the result and JPA updates the existing row.
     public Faculty(Faculty existing, boolean active) {
         this.id = existing.id;
         this.name = existing.name;

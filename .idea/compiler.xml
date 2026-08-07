@@ -7,10 +7,11 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="campus-events" />
-        <module name="backend" />
+        <module name="swing-frontend" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="backend" target="21" />
       <module name="frontend" target="21" />
     </bytecodeTargetLevel>
   </component>

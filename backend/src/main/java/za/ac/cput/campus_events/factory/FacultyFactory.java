@@ -17,7 +17,6 @@ public class FacultyFactory {
 
         return new Faculty.Builder()
                 .setName(name)
-                .setStatus(status)
                 .setEmail(contactEmail)
                 .setCreatedByAdmin(createdByAdmin)
                 .build();

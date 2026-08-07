@@ -9,10 +9,12 @@ import java.net.http.HttpResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.formdev.flatlaf.FlatLightLaf;
-import za.ac.cput.DTO.*;
-
+import za.ac.cput.DTO.RegisterRequestDTO;
+import za.ac.cput.DTO.RegisterResponseDTO;
+import za.ac.cput.DTO.RegisterResponseDTO;
 
 public class Register extends JFrame {
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final ButtonGroup roleGroup = new ButtonGroup();
     private JToggleButton btnRoleStudent;
@@ -44,12 +46,12 @@ public class Register extends JFrame {
     private static final Font HEADING_FONT = new Font("SansSerif", Font.BOLD, 24);
     private static final Font NOTICE_FONT = new Font("SansSerif", Font.ITALIC, 11);
 
-    // label : input, one line — same numbers used for every row on this screen
     private static final int LABEL_WIDTH = 170;
     private static final int FIELD_WIDTH = 300;
     private static final int FIELD_HEIGHT = 38;
     private static final Dimension FIELD_SIZE = new Dimension(FIELD_WIDTH, FIELD_HEIGHT);
     private static final Dimension ROW_SIZE = new Dimension(LABEL_WIDTH + 10 + FIELD_WIDTH, FIELD_HEIGHT);
+    private static final String BASE_URL = "http://localhost:8080";
 
     public Register() {
         // set up the window — same size as Login
@@ -76,14 +78,11 @@ public class Register extends JFrame {
         txtLastName = new JTextField();
         txtEmail = new JTextField();
         txtStudentNumber = new JTextField();
-        cmbFacultyStudent = new JComboBox<>(new String[]{"Select faculty..."});
-        cmbFacultyOrganiser = new JComboBox<>(new String[]{"Select faculty..."});
+        cmbFacultyStudent = new JComboBox<>(new String[]{"ICT"});
+        cmbFacultyOrganiser = new JComboBox<>(new String[]{"ICT"});
         pwdPassword = new JPasswordField();
         pwdConfirm = new JPasswordField();
 
-        // every field gets the exact same preferred AND maximum size — the maximum
-        // is what actually matters, without it BoxLayout stretches a field to fill
-        // whatever space is left over
         for (JTextField f : new JTextField[]{txtFirstName, txtLastName, txtEmail, txtStudentNumber, pwdPassword, pwdConfirm}) {
             f.setFont(FIELD_FONT);
             f.setPreferredSize(FIELD_SIZE);
@@ -95,19 +94,15 @@ public class Register extends JFrame {
             c.setMaximumSize(FIELD_SIZE);
         }
 
+        lblPendingNotice = new JLabel("<html>Needs admin approval before you can create events.</html>");
+        lblPendingNotice.setFont(NOTICE_FONT);
+        lblPendingNotice.setForeground(Color.GRAY);
+
         btnRegister = new JButton("Create account");
         btnGoLogin = new JButton("Already have an account? Sign in");
         btnRegister.setFont(BUTTON_FONT);
         btnGoLogin.setFont(LABEL_FONT);
-        btnRegister.setPreferredSize(new Dimension(ROW_SIZE.width, 44));
-        btnGoLogin.setPreferredSize(new Dimension(ROW_SIZE.width, 28));
 
-        // create image panel
-        JPanel purplePanel = new JPanel();
-        purplePanel.setBackground(new Color(108, 61, 189));
-        purplePanel.setPreferredSize(new Dimension(400, 720));
-
-        // ---- conditional Student vs Organiser fields (CardLayout swaps them) ----
         studentFieldsPanel = buildStudentFieldsPanel();
         organiserFieldsPanel = buildOrganiserFieldsPanel();
 
@@ -119,17 +114,12 @@ public class Register extends JFrame {
         conditionalWrapper.add(organiserFieldsPanel, "ORGANISER");
 
         btnRoleStudent.addItemListener(e -> {
-            if (btnRoleStudent.isSelected()) {
-                conditionalLayout.show(conditionalWrapper, "STUDENT");
-            }
+            if (btnRoleStudent.isSelected()) conditionalLayout.show(conditionalWrapper, "STUDENT");
         });
         btnRoleOrganiser.addItemListener(e -> {
-            if (btnRoleOrganiser.isSelected()) {
-                conditionalLayout.show(conditionalWrapper, "ORGANISER");
-            }
+            if (btnRoleOrganiser.isSelected()) conditionalLayout.show(conditionalWrapper, "ORGANISER");
         });
 
-        // create form panel
         JPanel formSide = new JPanel();
         formSide.setLayout(new BoxLayout(formSide, BoxLayout.Y_AXIS));
         formSide.setBorder(BorderFactory.createEmptyBorder(24, 40, 24, 40));
@@ -149,7 +139,6 @@ public class Register extends JFrame {
         btnGoLogin.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnGoLogin.setMaximumSize(new Dimension(ROW_SIZE.width, 28));
 
-        // single column, but each row is "label : input" on one line
         formSide.add(heading);
         formSide.add(Box.createVerticalStrut(16));
         formSide.add(rolePanel);
@@ -170,58 +159,44 @@ public class Register extends JFrame {
         formSide.add(Box.createVerticalStrut(8));
         formSide.add(btnGoLogin);
 
-        // assemble
+        JPanel purplePanel = new JPanel();
+        purplePanel.setBackground(new Color(108, 61, 189));
+        purplePanel.setPreferredSize(new Dimension(400, 720));
+
         JPanel root = new JPanel(new BorderLayout());
         root.add(purplePanel, BorderLayout.WEST);
         root.add(formSide, BorderLayout.CENTER);
         setContentPane(root);
 
-        // link to login screen
         btnGoLogin.addActionListener(e -> {
             new Login().setVisible(true);
             this.dispose();
         });
 
-        btnRegister.addActionListener(e -> {
-            RegisterRequestDTO request = new RegisterRequestDTO();
-
-            request.setRole("STUDENT");
-            request.setEmail(txtEmail.getText().trim());
-            request.setPassword(new String("mypassword"));
-            request.setFacultyId(44L);
-            request.setStudentNumber(txtStudentNumber.getText().trim());
-
-            register(request);
-        });
+        btnRegister.addActionListener(e -> handleRegister());
     }
 
     private JPanel buildStudentFieldsPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
         panel.add(labeledRow("Student number", txtStudentNumber));
         panel.add(Box.createVerticalStrut(8));
         panel.add(labeledRow("Faculty", cmbFacultyStudent));
-
         return panel;
     }
+
     private JPanel buildOrganiserFieldsPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        lblPendingNotice = new JLabel("Pending organiser approval.");
-        lblPendingNotice.setFont(LABEL_FONT);
         lblPendingNotice.setAlignmentX(Component.CENTER_ALIGNMENT);
-
         panel.add(labeledRow("Faculty", cmbFacultyOrganiser));
         panel.add(Box.createVerticalStrut(4));
         panel.add(lblPendingNotice);
-
         return panel;
     }
-    // label : input, side by side on one line
+
     private JPanel labeledRow(String labelText, JComponent field) {
         JPanel row = new JPanel();
         row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
@@ -241,198 +216,49 @@ public class Register extends JFrame {
         return row;
     }
 
-    public void register(RegisterRequestDTO request) {
+    private String getSelectedRole() {
+        return btnRoleOrganiser.isSelected() ? "ORGANISER" : "STUDENT";
+    }
+
+    private void handleRegister() {
+        String password = new String(pwdPassword.getPassword());
+        String confirm = new String(pwdConfirm.getPassword());
+
+        if (!password.equals(confirm)) {
+            JOptionPane.showMessageDialog(this, "Passwords don't match", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
         try {
-            ObjectMapper mapper = new ObjectMapper();
+            RegisterRequestDTO register = new RegisterRequestDTO();
+            register.setRole(getSelectedRole());
+            register.setEmail(txtEmail.getText());
+            register.setPassword(password);
+            register.setFacultyId(1L);
+
+            if (getSelectedRole().equals("STUDENT")) {
+                register.setStudentNumber(txtStudentNumber.getText());
+            }
+
             HttpClient client = HttpClient.newHttpClient();
-
-            // ---------------- REGISTER ----------------
-
-            HttpRequest registerRequest = HttpRequest.newBuilder()
-                    .uri(new URI("http://localhost:8080/api/auth/register"))
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/auth/register"))
                     .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(
-                            mapper.writeValueAsString(request)))
+                    .POST(HttpRequest.BodyPublishers.ofString(MAPPER.writeValueAsString(register)))
                     .build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            RegisterResponseDTO result = MAPPER.readValue(response.body(), RegisterResponseDTO.class);
 
-            HttpResponse<String> registerResponse =
-                    client.send(registerRequest, HttpResponse.BodyHandlers.ofString());
-
-            System.out.println("Status: " + registerResponse.statusCode());
-            System.out.println(registerResponse.body());
-
-            if (registerResponse.statusCode() != 200) {
-                JOptionPane.showMessageDialog(
-                        null,
-                        registerResponse.body(),
-                        "Server Error",
-                        JOptionPane.ERROR_MESSAGE
-                );
-                return;
+            if (result.isSuccess()) {
+                new Verify(result.getUuid()).setVisible(true);
+                this.dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, result.getMessage(),
+                        "Registration failed", JOptionPane.ERROR_MESSAGE);
             }
-
-            RegisterResponseDTO registerResult =
-                    mapper.readValue(registerResponse.body(), RegisterResponseDTO.class);
-
-            if (!registerResult.isSuccess()) {
-                JOptionPane.showMessageDialog(
-                        null,
-                        registerResult.getMessage(),
-                        "Registration Failed",
-                        JOptionPane.ERROR_MESSAGE
-                );
-                return;
-            }
-
-            String uuid = registerResult.getUuid();
-
-            // ---------------- VERIFY ----------------
-
-            while (true) {
-
-                String pin = JOptionPane.showInputDialog(
-                        null,
-                        "Enter the verification PIN sent to your email:",
-                        "Verify Account",
-                        JOptionPane.PLAIN_MESSAGE
-                );
-
-                if (pin == null) {
-                    return;
-                }
-
-                VerifyRequestDTO verifyRequest = new VerifyRequestDTO();
-                verifyRequest.setUuid(uuid);
-                verifyRequest.setPin(pin);
-
-                HttpRequest httpVerifyRequest = HttpRequest.newBuilder()
-                        .uri(new URI("http://localhost:8080/api/auth/verify"))
-                        .header("Content-Type", "application/json")
-                        .POST(HttpRequest.BodyPublishers.ofString(
-                                mapper.writeValueAsString(verifyRequest)))
-                        .build();
-
-                HttpResponse<String> verifyResponse =
-                        client.send(httpVerifyRequest, HttpResponse.BodyHandlers.ofString());
-
-                if (verifyResponse.statusCode() != 200) {
-                    JOptionPane.showMessageDialog(
-                            null,
-                            verifyResponse.body(),
-                            "Server Error",
-                            JOptionPane.ERROR_MESSAGE
-                    );
-                    return;
-                }
-
-                VerifyResponseDTO verifyResult =
-                        mapper.readValue(verifyResponse.body(), VerifyResponseDTO.class);
-
-                if (verifyResult.isSuccess()) {
-                    JOptionPane.showMessageDialog(
-                            null,
-                            verifyResult.getMessage(),
-                            "Success",
-                            JOptionPane.INFORMATION_MESSAGE
-                    );
-                    return;
-                }
-
-                String message = verifyResult.getMessage();
-
-                // Wrong PIN -> Retry
-                if ("Incorrect PIN.".equalsIgnoreCase(message)) {
-
-                    JOptionPane.showMessageDialog(
-                            null,
-                            "Incorrect PIN. Please try again.",
-                            "Verification Failed",
-                            JOptionPane.ERROR_MESSAGE
-                    );
-
-                    continue;
-                }
-
-                // PIN expired -> Resend
-                if ("Verification PIN has expired.".equalsIgnoreCase(message)) {
-
-                    int option = JOptionPane.showConfirmDialog(
-                            null,
-                            "Your PIN has expired.\nWould you like a new one?",
-                            "PIN Expired",
-                            JOptionPane.YES_NO_OPTION
-                    );
-
-                    if (option != JOptionPane.YES_OPTION) {
-                        return;
-                    }
-
-                    ResendRequestDTO resendRequest = new ResendRequestDTO();
-                    resendRequest.setUuid(uuid);
-
-                    HttpRequest resendHttpRequest = HttpRequest.newBuilder()
-                            .uri(new URI("http://localhost:8080/api/auth/resend"))
-                            .header("Content-Type", "application/json")
-                            .POST(HttpRequest.BodyPublishers.ofString(
-                                    mapper.writeValueAsString(resendRequest)))
-                            .build();
-
-                    HttpResponse<String> resendResponse =
-                            client.send(resendHttpRequest, HttpResponse.BodyHandlers.ofString());
-
-                    if (resendResponse.statusCode() != 200) {
-                        JOptionPane.showMessageDialog(
-                                null,
-                                resendResponse.body(),
-                                "Server Error",
-                                JOptionPane.ERROR_MESSAGE
-                        );
-                        return;
-                    }
-
-                    RegisterResponseDTO resendResult =
-                            mapper.readValue(resendResponse.body(), RegisterResponseDTO.class);
-
-                    if (!resendResult.isSuccess()) {
-                        JOptionPane.showMessageDialog(
-                                null,
-                                resendResult.getMessage(),
-                                "Resend Failed",
-                                JOptionPane.ERROR_MESSAGE
-                        );
-                        return;
-                    }
-
-                    JOptionPane.showMessageDialog(
-                            null,
-                            "A new PIN has been generated.\nPlease check your email.",
-                            "PIN Sent",
-                            JOptionPane.INFORMATION_MESSAGE
-                    );
-
-                    continue;
-                }
-
-                JOptionPane.showMessageDialog(
-                        null,
-                        message,
-                        "Verification Failed",
-                        JOptionPane.ERROR_MESSAGE
-                );
-
-                return;
-            }
-
         } catch (Exception ex) {
-            ex.printStackTrace();
-
-            JOptionPane.showMessageDialog(
-                    null,
-                    "Unable to communicate with the server.\n\n" + ex.getMessage(),
-                    "Connection Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this, "Could not reach the backend: " + ex.getMessage(),
+                    "Connection error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -442,10 +268,6 @@ public class Register extends JFrame {
         } catch (UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
-
-        SwingUtilities.invokeLater(() -> {
-            Register register = new Register();
-            register.setVisible(true);
-        });
+        SwingUtilities.invokeLater(() -> new Register().setVisible(true));
     }
 }
