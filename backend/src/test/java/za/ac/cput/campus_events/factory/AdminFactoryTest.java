@@ -5,25 +5,25 @@ import za.ac.cput.campus_events.domain.Admin;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class AdminFactoryTest {
+class AdminFactoryTest {@Test
+void createAdminSuccess() {
+    Admin admin = AdminFactory.createAdmin(
+            "Alice",
+            "Jones",
+            "alice.jones@gmail.com",
+            "Password123!"
+    );
 
-    @Test
-    void createAdminSuccess() {
-        Admin admin = AdminFactory.createAdmin(
-                "Alice",
-                "Jones",
-                "alice.jones@gmail.com"
-        );
-
-        assertNotNull(admin);
-    }
+    assertNotNull(admin);
+}
 
     @Test
     void createAdminWithNullFirstName() {
         Admin admin = AdminFactory.createAdmin(
                 null,
                 "Jones",
-                "alice.jones@gmail.com"
+                "alice.jones@gmail.com",
+                "Password123!"
         );
 
         assertNull(admin);
@@ -34,7 +34,8 @@ class AdminFactoryTest {
         Admin admin = AdminFactory.createAdmin(
                 "Al",
                 "Jones",
-                "alice.jones@gmail.com"
+                "alice.jones@gmail.com",
+                "Password123!"
         );
 
         assertNull(admin);
@@ -45,7 +46,8 @@ class AdminFactoryTest {
         Admin admin = AdminFactory.createAdmin(
                 "Alice",
                 null,
-                "alice.jones@gmail.com"
+                "alice.jones@gmail.com",
+                "Password123!"
         );
 
         assertNull(admin);
@@ -56,7 +58,8 @@ class AdminFactoryTest {
         Admin admin = AdminFactory.createAdmin(
                 "Alice",
                 "Jo",
-                "alice.jones@gmail.com"
+                "alice.jones@gmail.com",
+                "Password123!"
         );
 
         assertNull(admin);
@@ -67,7 +70,8 @@ class AdminFactoryTest {
         Admin admin = AdminFactory.createAdmin(
                 "Alice",
                 "Jones",
-                "invalid-email"
+                "invalid-email",
+                "Password123!"
         );
 
         assertNull(admin);

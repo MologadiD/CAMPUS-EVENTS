@@ -15,5 +15,4 @@ public interface IFacultyService extends Iservice<Faculty, Long>{
     void deleteById(Long id);
     void deactivate(Long facultyId);
 
-    List<Faculty> findByStatus(String status);
 }
