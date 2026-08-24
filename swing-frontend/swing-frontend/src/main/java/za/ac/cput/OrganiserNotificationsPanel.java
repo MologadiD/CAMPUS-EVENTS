@@ -54,13 +54,29 @@ public class OrganiserNotificationsPanel extends JPanel {
         title.setFont(new Font("Arial", Font.BOLD, 28));
         title.setForeground(CPUT_BLUE);
 
+        JButton refreshButton = new JButton("↻ Refresh");
+        refreshButton.setBackground(CPUT_BLUE);
+        refreshButton.setForeground(Color.WHITE);
+        refreshButton.setFocusPainted(false);
+        refreshButton.setFont(new Font("Arial", Font.BOLD, 13));
+        refreshButton.addActionListener(e -> handleRefresh());
+
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(Color.WHITE);
         header.add(title, BorderLayout.WEST);
+        header.add(refreshButton, BorderLayout.EAST);
 
         card.add(header, BorderLayout.NORTH);
         card.add(buildInboxTable(), BorderLayout.CENTER);
         return card;
+    }
+
+    private void handleRefresh() {
+        // TODO: GET /notification/organiser/{recipientId} here — refetch instead of reseeding
+        openRow = -1;
+        inboxModel.setRowCount(0);
+        seedInbox();
+        inboxTable.repaint();
     }
 
     private JScrollPane buildInboxTable() {

@@ -35,9 +35,24 @@ public class NotificationsPanel extends JPanel {
         title.setFont(new Font("Arial", Font.BOLD, 28));
         title.setForeground(CPUT_BLUE);
 
+        JButton refreshButton = new JButton("↻ Refresh");
+        refreshButton.setBackground(CPUT_BLUE);
+        refreshButton.setForeground(Color.WHITE);
+        refreshButton.setFocusPainted(false);
+        refreshButton.setFont(new Font("Arial", Font.BOLD, 13));
+        refreshButton.addActionListener(e -> handleRefresh());
+
         header.add(title, BorderLayout.WEST);
+        header.add(refreshButton, BorderLayout.EAST);
         return header;
 
+    }
+
+    private void handleRefresh() {
+        // TODO: GET /notification?recipientId=&recipientType=ADMIN here — refetch instead of reseeding
+        tableModel.setRowCount(0);
+        seedRows();
+        table.repaint();
     }
 
     private JScrollPane buildTable() {
