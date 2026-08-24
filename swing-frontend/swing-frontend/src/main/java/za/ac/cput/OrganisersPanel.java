@@ -65,6 +65,7 @@ public class OrganisersPanel extends JPanel {
         scrollPane.getViewport().setBackground(Color.WHITE);
 
         new TableButtonColumn(table, 4, this::handleStatusToggle);
+        table.getColumnModel().getColumn(3).setCellRenderer(new StatusBadge());
 
         return scrollPane;
     }

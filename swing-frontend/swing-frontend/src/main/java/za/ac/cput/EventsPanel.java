@@ -64,7 +64,10 @@ public class EventsPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.getViewport().setBackground(Color.WHITE);
 
-        new TableButtonColumn(table, 5, this::handleForceCancel);
+        // Force cancel is terminal: after committing, the action becomes
+        // static non-clickable "Cancelled" text
+        new TableButtonColumn(table, 5, this::handleForceCancel, new Color(190, 30, 45), "Cancelled");
+        table.getColumnModel().getColumn(4).setCellRenderer(new StatusBadge());
 
         return scrollPane;
     }

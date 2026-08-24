@@ -65,6 +65,7 @@ public class StudentsPanel extends JPanel {
         scrollPane.getViewport().setBackground(Color.WHITE);
 
         new TableButtonColumn(table, 5, this::handleStatusToggle);
+        table.getColumnModel().getColumn(4).setCellRenderer(new StatusBadge());
 
         return scrollPane;
     }

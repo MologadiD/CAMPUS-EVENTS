@@ -78,7 +78,9 @@ public class NotificationsPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.getViewport().setBackground(Color.WHITE);
 
-        new TableButtonColumn(table, 3, this::handleMarkAsRead);
+        // Mark as read is one-way: once read the action becomes static "—"
+        new TableButtonColumn(table, 3, this::handleMarkAsRead, "—");
+        table.getColumnModel().getColumn(2).setCellRenderer(new StatusBadge());
 
         return scrollPane;
     }
