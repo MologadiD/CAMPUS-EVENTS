@@ -3,509 +3,168 @@ package za.ac.cput;
 import com.formdev.flatlaf.FlatLightLaf;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
 
 public class OrganiserDashboard extends JFrame {
 
+    private CardLayout cardLayout;
     private JPanel contentPanel;
-    private JPanel navigationPanel;
-    private JLabel breadcrumbLabel;
-    private JButton notificationButton;
-    private JPopupMenu notificationMenu;
 
-    private final Map<String, JButton> navigationButtons = new HashMap<>();
+    private static final Color SIDEBAR_BG = new Color(0, 51, 102);
+    private static final Color SIDEBAR_ACTIVE = new Color(0, 71, 133);
+
+    private JButton btnDashboard;
+    private JButton btnMyEvents;
+    private JButton btnNotifications;
+    private JButton btnLogout;
 
     public OrganiserDashboard() {
-
-        setTitle("Campus Events - Organiser");
+        setTitle("Campus Events - Organiser Dashboard");
         setSize(1200, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
-
         setLayout(new BorderLayout());
+        setWindowIcon();
 
-        createSidebar();
-        createTopBar();
-        createContent();
+        add(buildNavigation(), BorderLayout.WEST);
+        add(buildContent(), BorderLayout.CENTER);
 
-        showDashboard();
-
-        setVisible(true);
+        cardLayout.show(contentPanel, "dashboard");
+        setActiveNav(btnDashboard);
     }
 
-    // =========================
-    // SIDEBAR
-    // =========================
-
-    private void createSidebar() {
-
-        navigationPanel = new JPanel();
-
-        navigationPanel.setLayout(
-                new BoxLayout(navigationPanel, BoxLayout.Y_AXIS)
-        );
-
-        navigationPanel.setPreferredSize(
-                new Dimension(220, 700)
-        );
-
-        navigationPanel.setBorder(
-                new EmptyBorder(20, 15, 20, 15)
-        );
-
-        JLabel appName = new JLabel("Campus Events");
-
-        appName.setFont(
-                new Font("Arial", Font.BOLD, 22)
-        );
-
-        appName.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JLabel roleLabel = new JLabel("Organiser");
-
-        roleLabel.setFont(
-                new Font("Arial", Font.PLAIN, 14)
-        );
-
-        roleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        navigationPanel.add(appName);
-        navigationPanel.add(Box.createVerticalStrut(5));
-        navigationPanel.add(roleLabel);
-        navigationPanel.add(Box.createVerticalStrut(30));
-
-        addNavigationButton("Dashboard");
-        addNavigationButton("My Events");
-        addNavigationButton("Notifications");
-
-        navigationPanel.add(Box.createVerticalGlue());
-
-        JButton logoutButton = new JButton("Logout");
-
-        logoutButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        logoutButton.setMaximumSize(
-                new Dimension(Integer.MAX_VALUE, 40)
-        );
-
-        logoutButton.addActionListener(e -> logout());
-
-        navigationPanel.add(logoutButton);
-
-        add(navigationPanel, BorderLayout.WEST);
-    }
-
-    private void addNavigationButton(String name) {
-
-        JButton button = new JButton(name);
-
-        button.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        button.setMaximumSize(
-                new Dimension(Integer.MAX_VALUE, 40)
-        );
-
-        button.addActionListener(e -> navigate(name));
-
-        navigationButtons.put(name, button);
-
-        navigationPanel.add(button);
-
-        navigationPanel.add(
-                Box.createVerticalStrut(8)
-        );
-    }
-
-    // =========================
-    // NAVIGATION
-    // =========================
-
-    private void navigate(String destination) {
-
-        switch (destination) {
-
-            case "Dashboard":
-                showDashboard();
-                break;
-
-            case "My Events":
-                openMyEvents();
-                break;
-
-            case "Notifications":
-                new Notifications();
-                break;
-
-            default:
-                break;
+    private void setWindowIcon() {
+        try {
+            java.net.URL iconUrl = getClass().getResource("/za/ac/cput/images/image.png");
+            if (iconUrl != null) {
+                setIconImage(new ImageIcon(iconUrl).getImage());
+            }
+        } catch (Exception ignored) {
         }
     }
 
-    // =========================
-    // TOP BAR
-    // =========================
+    private JPanel buildNavigation() {
+        JPanel nav = new JPanel();
+        nav.setLayout(new BoxLayout(nav, BoxLayout.Y_AXIS));
+        nav.setPreferredSize(new Dimension(220, 700));
+        nav.setBackground(SIDEBAR_BG);
+        nav.setBorder(BorderFactory.createEmptyBorder(20, 12, 20, 12));
 
-    private void createTopBar() {
+        btnDashboard = navButton("Dashboard");
+        btnMyEvents = navButton("My Events");
+        btnNotifications = navButton("Notifications");
+        btnLogout = navButton("Logout");
 
-        JPanel topBar = new JPanel(
-                new BorderLayout()
-        );
+        btnDashboard.addActionListener(e -> switchTo("dashboard", btnDashboard));
+        btnMyEvents.addActionListener(e -> switchTo("myEvents", btnMyEvents));
+        btnNotifications.addActionListener(e -> switchTo("notifications", btnNotifications));
+        btnLogout.addActionListener(e -> {
+            new Login().setVisible(true);
+            this.dispose();
+        });
 
-        topBar.setPreferredSize(
-                new Dimension(980, 60)
-        );
+        nav.add(btnDashboard);
+        nav.add(Box.createVerticalStrut(4));
+        nav.add(btnMyEvents);
+        nav.add(Box.createVerticalStrut(4));
+        nav.add(btnNotifications);
+        nav.add(Box.createVerticalGlue());
+        nav.add(btnLogout);
 
-        topBar.setBorder(
-                new EmptyBorder(10, 20, 10, 20)
-        );
-
-        breadcrumbLabel = new JLabel(
-                "Dashboard"
-        );
-
-        breadcrumbLabel.setFont(
-                new Font("Arial", Font.BOLD, 18)
-        );
-
-        JPanel rightPanel = new JPanel(
-                new FlowLayout(FlowLayout.RIGHT)
-        );
-
-        notificationButton = new JButton("🔔");
-
-        notificationButton.setToolTipText(
-                "Notifications"
-        );
-
-        createNotificationMenu();
-
-        notificationButton.addActionListener(e ->
-                notificationMenu.show(
-                        notificationButton,
-                        0,
-                        notificationButton.getHeight()
-                )
-        );
-
-        JLabel userChip = new JLabel(
-                "  Organiser  "
-        );
-
-        userChip.setBorder(
-                BorderFactory.createLineBorder(
-                        Color.GRAY
-                )
-        );
-
-        rightPanel.add(notificationButton);
-        rightPanel.add(userChip);
-
-        topBar.add(
-                breadcrumbLabel,
-                BorderLayout.WEST
-        );
-
-        topBar.add(
-                rightPanel,
-                BorderLayout.EAST
-        );
-
-        add(
-                topBar,
-                BorderLayout.NORTH
-        );
+        return nav;
     }
 
-    // =========================
-    // NOTIFICATION DROPDOWN
-    // =========================
-
-    private void createNotificationMenu() {
-
-        notificationMenu = new JPopupMenu();
-
-        JMenuItem notification1 =
-                new JMenuItem(
-                        "Event registrations opened"
-                );
-
-        JMenuItem notification2 =
-                new JMenuItem(
-                        "New event reminder"
-                );
-
-        JMenuItem notification3 =
-                new JMenuItem(
-                        "System notification"
-                );
-
-        notificationMenu.add(notification1);
-        notificationMenu.add(notification2);
-        notificationMenu.add(notification3);
+    private JButton navButton(String label) {
+        JButton button = new JButton(label);
+        button.setFont(new Font("Arial", Font.BOLD, 14));
+        button.setForeground(Color.WHITE);
+        button.setBackground(SIDEBAR_BG);
+        button.setFocusPainted(false);
+        button.setFocusable(false);
+        button.setBorderPainted(false);
+        button.setContentAreaFilled(true);
+        button.setHorizontalAlignment(SwingConstants.LEFT);
+        button.setAlignmentX(Component.LEFT_ALIGNMENT);
+        button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
+        button.setBorder(BorderFactory.createEmptyBorder(10, 14, 10, 14));
+        return button;
     }
 
-    // =========================
-    // CONTENT PANEL
-    // =========================
-
-    private void createContent() {
-
-        contentPanel = new JPanel(
-                new BorderLayout()
-        );
-
-        contentPanel.setBorder(
-                new EmptyBorder(
-                        20,
-                        20,
-                        20,
-                        20
-                )
-        );
-
-        add(
-                contentPanel,
-                BorderLayout.CENTER
-        );
+    private void switchTo(String cardName, JButton activeButton) {
+        cardLayout.show(contentPanel, cardName);
+        setActiveNav(activeButton);
     }
 
-    // =========================
-    // DASHBOARD
-    // =========================
-
-    private void showDashboard() {
-
-        contentPanel.removeAll();
-
-        breadcrumbLabel.setText(
-                "Dashboard"
-        );
-
-        JPanel dashboardPanel =
-                new JPanel(
-                        new BorderLayout()
-                );
-
-        dashboardPanel.setBorder(
-                BorderFactory.createEmptyBorder(
-                        20,
-                        20,
-                        20,
-                        20
-                )
-        );
-
-        JLabel title =
-                new JLabel(
-                        "Organiser Dashboard"
-                );
-
-        title.setFont(
-                new Font(
-                        "Arial",
-                        Font.BOLD,
-                        28
-                )
-        );
-
-        dashboardPanel.add(
-                title,
-                BorderLayout.NORTH
-        );
-
-        JPanel cardsPanel =
-                new JPanel(
-                        new GridLayout(
-                                1,
-                                3,
-                                20,
-                                20
-                        )
-                );
-
-        cardsPanel.add(
-                createStatCard(
-                        "12",
-                        "Events created"
-                )
-        );
-
-        cardsPanel.add(
-                createStatCard(
-                        "8",
-                        "Currently open"
-                )
-        );
-
-        cardsPanel.add(
-                createStatCard(
-                        "245",
-                        "Tickets issued"
-                )
-        );
-
-        dashboardPanel.add(
-                cardsPanel,
-                BorderLayout.CENTER
-        );
-
-        contentPanel.add(
-                dashboardPanel,
-                BorderLayout.CENTER
-        );
-
-        contentPanel.revalidate();
-        contentPanel.repaint();
+    private void setActiveNav(JButton active) {
+        for (JButton b : new JButton[]{btnDashboard, btnMyEvents, btnNotifications}) {
+            b.setBackground(b == active ? SIDEBAR_ACTIVE : SIDEBAR_BG);
+        }
     }
 
-    // =========================
-    // STATISTIC CARD
-    // =========================
+    private JPanel buildContent() {
+        cardLayout = new CardLayout();
+        contentPanel = new JPanel(cardLayout);
 
-    private JPanel createStatCard(
-            String number,
-            String label
-    ) {
+        contentPanel.add(buildDashboardPanel(), "dashboard");
+        contentPanel.add(new MyEventsPanel(), "myEvents");
+        contentPanel.add(new OrganiserNotificationsPanel(), "notifications");
 
-        JPanel card =
-                new JPanel(
-                        new GridBagLayout()
-                );
+        return contentPanel;
+    }
 
-        card.setBorder(
-                BorderFactory.createLineBorder(
-                        Color.GRAY
-                )
-        );
+    private JPanel buildDashboardPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JPanel inner =
-                new JPanel();
+        JLabel title = new JLabel("Welcome back");
+        title.setFont(new Font("Arial", Font.BOLD, 28));
+        title.setForeground(new Color(0, 51, 102));
+        panel.add(title, BorderLayout.NORTH);
 
-        inner.setLayout(
-                new BoxLayout(
-                        inner,
-                        BoxLayout.Y_AXIS
-                )
-        );
+        // TODO: placeholder stat cards — these three big blocks are ugly.
+        // We'll generate proper SVGs for the dashboard visuals later.
+        JPanel cards = new JPanel(new GridLayout(1, 3, 20, 20));
+        cards.setBackground(Color.WHITE);
+        cards.add(statCard("12", "Events created"));
+        cards.add(statCard("8", "Currently open"));
+        cards.add(statCard("245", "Tickets issued"));
+        panel.add(cards, BorderLayout.CENTER);
 
-        JLabel numberLabel =
-                new JLabel(
-                        number,
-                        SwingConstants.CENTER
-                );
+        return panel;
+    }
 
-        numberLabel.setFont(
-                new Font(
-                        "Arial",
-                        Font.BOLD,
-                        32
-                )
-        );
+    private JPanel statCard(String number, String label) {
+        JPanel card = new JPanel(new GridBagLayout());
+        card.setBackground(Color.WHITE);
+        card.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
-        numberLabel.setAlignmentX(
-                Component.CENTER_ALIGNMENT
-        );
+        JPanel inner = new JPanel();
+        inner.setBackground(Color.WHITE);
+        inner.setLayout(new BoxLayout(inner, BoxLayout.Y_AXIS));
 
-        JLabel labelLabel =
-                new JLabel(
-                        label,
-                        SwingConstants.CENTER
-                );
+        JLabel numberLabel = new JLabel(number, SwingConstants.CENTER);
+        numberLabel.setFont(new Font("Arial", Font.BOLD, 32));
+        numberLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        labelLabel.setFont(
-                new Font(
-                        "Arial",
-                        Font.PLAIN,
-                        16
-                )
-        );
-
-        labelLabel.setAlignmentX(
-                Component.CENTER_ALIGNMENT
-        );
+        JLabel textLabel = new JLabel(label, SwingConstants.CENTER);
+        textLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        textLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         inner.add(numberLabel);
-
-        inner.add(
-                Box.createVerticalStrut(10)
-        );
-
-        inner.add(labelLabel);
-
+        inner.add(Box.createVerticalStrut(10));
+        inner.add(textLabel);
         card.add(inner);
-
         return card;
     }
 
-    // =========================
-    // OPEN MY EVENTS
-    // =========================
-
-    private void openMyEvents() {
-
-        new MyEvents().setVisible(true);
-
-        dispose();
-    }
-
-    // =========================
-    // OPEN NOTIFICATIONS
-    // =========================
-
-    private void openNotifications() {
-
-        new Notifications().setVisible(true);
-
-        dispose();
-    }
-
-    // =========================
-    // LOGOUT
-    // =========================
-
-    private void logout() {
-
-        int choice =
-                JOptionPane.showConfirmDialog(
-                        this,
-                        "Are you sure you want to logout?",
-                        "Logout",
-                        JOptionPane.YES_NO_OPTION
-                );
-
-        if (choice == JOptionPane.YES_OPTION) {
-
-            dispose();
-
-
-        }
-    }
-
-    // =========================
-    // MAIN
-    // =========================
-
     public static void main(String[] args) {
-
         try {
-
-            UIManager.setLookAndFeel(
-                    new FlatLightLaf()
-            );
-
-        } catch (
-                UnsupportedLookAndFeelException e
-        ) {
-
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
-
-        SwingUtilities.invokeLater(
-                OrganiserDashboard::new
-        );
+        SwingUtilities.invokeLater(() -> new OrganiserDashboard().setVisible(true));
     }
 }
