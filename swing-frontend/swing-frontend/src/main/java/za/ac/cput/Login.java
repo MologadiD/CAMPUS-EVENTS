@@ -192,11 +192,19 @@ public class Login extends JFrame {
                     MAPPER.readValue(response.body(), LoginResponseDTO.class);
 
             if (loginResponse.isSuccess()) {
-                // TODO: Open dashboard based on loginResponse.getRole()
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Logged in as " + loginResponse.getRole()
-                );
+                if ("ORGANISER".equalsIgnoreCase(loginResponse.getRole())) {
+                    if (loginResponse.getAccountId() == null) {
+                        JOptionPane.showMessageDialog(this, "Login succeeded but no organiser account ID was returned.", "Login error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    new OrganiserDashboard(loginResponse.getAccountId()).setVisible(true);
+                    this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Logged in as " + loginResponse.getRole()
+                    );
+                }
             } else {
                 JOptionPane.showMessageDialog(
                         this,
