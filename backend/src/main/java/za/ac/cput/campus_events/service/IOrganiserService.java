@@ -1,11 +1,8 @@
 package za.ac.cput.campus_events.service;
-/*
-Mologadi Dikgale
-Student No: 231016263
- */
 
-import za.ac.cput.campus_events.domain.Organiser;
 import za.ac.cput.campus_events.domain.Event;
+import za.ac.cput.campus_events.domain.Organiser;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -15,14 +12,13 @@ public interface IOrganiserService extends Iservice<Organiser, Long> {
     List<Organiser> findAll();
     void deleteById(Long id);
 
-    // ── Registration ──────────────────────────────────────────────────────
     Organiser registerOrganiser(Organiser organiser, Long facultyId);
 
-    // ── Event management — gate is now isActive(), not verificationStatus ─
-    Event createEvent(Long organiserId, Event event);
-    Event updateEvent(Long organiserId, Event event);
-    void  closeEvent(Long organiserId, Long eventId);
+    Event createEvent(Long organiserId, String title, String description,
+                      java.time.LocalDateTime eventDate, Integer capacity, Long venueId);
+    Event updateEvent(Long organiserId, Long eventId, String title, String description,
+                      java.time.LocalDateTime eventDate, Integer capacity, Long venueId);
+    void closeEvent(Long organiserId, Long eventId);
 
-    // ── Status management ─────────────────────────────────────────────────
     void updateOrganiserStatus(Long organiserId, boolean active, Long requestingAdminId);
 }
