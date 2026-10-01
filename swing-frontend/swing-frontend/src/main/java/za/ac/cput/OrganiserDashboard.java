@@ -7,6 +7,8 @@ import java.awt.*;
 
 public class OrganiserDashboard extends JFrame {
 
+    private final Long organiserId;
+
     private CardLayout cardLayout;
     private JPanel contentPanel;
 
@@ -19,6 +21,11 @@ public class OrganiserDashboard extends JFrame {
     private JButton btnLogout;
 
     public OrganiserDashboard() {
+        this(null);
+    }
+
+    public OrganiserDashboard(Long organiserId) {
+        this.organiserId = organiserId;
         setTitle("Campus Events - Organiser Dashboard");
         setSize(1200, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -107,7 +114,7 @@ public class OrganiserDashboard extends JFrame {
         contentPanel = new JPanel(cardLayout);
 
         contentPanel.add(buildDashboardPanel(), "dashboard");
-        contentPanel.add(new MyEventsPanel(), "myEvents");
+        contentPanel.add(new MyEventsPanel(organiserId), "myEvents");
         contentPanel.add(new OrganiserNotificationsPanel(), "notifications");
 
         return contentPanel;

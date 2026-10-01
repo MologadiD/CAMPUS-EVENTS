@@ -20,7 +20,6 @@ public class Event {
     private Boolean open;
     private LocalDateTime createdAt;
 
-    // Relationships
     @ManyToOne
     @JoinColumn(name = "venue_id", nullable = false)
     private Venue venue;
@@ -36,7 +35,6 @@ public class Event {
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Ticket> tickets = new HashSet<>();
 
-    // Private constructor for Builder
     private Event(Builder builder) {
         this.title = builder.title;
         this.description = builder.description;
@@ -50,11 +48,37 @@ public class Event {
         this.tickets = builder.tickets;
     }
 
-    public Event() {
+    public Event() {}
 
+    public Event(Event existing, String title, String description,
+                 LocalDateTime eventDate, Integer capacity, Venue venue) {
+        this.id = existing.id;
+        this.title = title;
+        this.description = description;
+        this.eventDate = eventDate;
+        this.capacity = capacity;
+        this.open = existing.open;
+        this.createdAt = existing.createdAt;
+        this.venue = venue;
+        this.organiser = existing.organiser;
+        this.faculty = existing.faculty;
+        this.tickets = existing.tickets;
     }
 
-    // Builder Pattern
+    public Event(Event existing, boolean open) {
+        this.id = existing.id;
+        this.title = existing.title;
+        this.description = existing.description;
+        this.eventDate = existing.eventDate;
+        this.capacity = existing.capacity;
+        this.open = open;
+        this.createdAt = existing.createdAt;
+        this.venue = existing.venue;
+        this.organiser = existing.organiser;
+        this.faculty = existing.faculty;
+        this.tickets = existing.tickets;
+    }
+
     public static class Builder {
         private String title;
         private String description;
@@ -79,15 +103,10 @@ public class Event {
         public Builder setFaculty(Faculty faculty) { this.faculty = faculty; return this; }
         public Builder setTickets(Set<Ticket> tickets) { this.tickets = tickets; return this; }
         public Builder setPromoCodes(Set<PromoCode> promoCodes) { this.promoCodes = promoCodes; return this; }
-
         public Event build() { return new Event(this); }
-
-        public ErrorResponse.Builder id(Long id) {
-            return null;
-        }
+        public ErrorResponse.Builder id(Long id) { return null; }
     }
 
-    // Getters
     public Long getId() { return id; }
     public String getTitle() { return title; }
     public String getDescription() { return description; }
