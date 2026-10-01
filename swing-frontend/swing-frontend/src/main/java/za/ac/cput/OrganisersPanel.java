@@ -91,6 +91,7 @@ public class OrganisersPanel extends JPanel {
         tableModel.addRow(new Object[]{"Thandeka Zulu", "thandeka@cput.ac.za", "ICT", "Active", "Suspend"});
     }
 
+
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(new FlatLightLaf());

@@ -6,12 +6,17 @@ import org.springframework.stereotype.Service;
 import za.ac.cput.campus_events.DTO.CreateAdminResponseDTO;
 import za.ac.cput.campus_events.DTO.CreateAdminRequestDTO;
 import za.ac.cput.campus_events.domain.Admin;
+import za.ac.cput.campus_events.domain.Organiser;
 import za.ac.cput.campus_events.domain.PendingRegistration;
+import za.ac.cput.campus_events.domain.Student;
 import za.ac.cput.campus_events.factory.AdminFactory;
 import za.ac.cput.campus_events.repository.AdminRepository;
+import za.ac.cput.campus_events.repository.OrganiserRepository;
 import za.ac.cput.campus_events.repository.PendingRegistrationRepository;
 
 import java.time.LocalDateTime;
+
+import za.ac.cput.campus_events.repository.StudentRepository;
 import za.ac.cput.campus_events.service.EmailService;
 
 import java.util.Optional;
@@ -132,6 +137,33 @@ public class AdminService implements IAdminService {
                 "Admin created. Check your email to verify the account.",
                 null,
                 pendingRegistration.getUuid());
+    }
+    //Ban
+    @Override
+    public void banUser(Long userId, Long requestingAdminId) {
+        if (requestingAdminId == null)
+            throw new IllegalStateException("Admin only");
+
+        // For trying the ban
+        StudentRepository.findById(userId).ifPresent(existing -> {
+            Student banned = new Student.Builder()
+                    .id(existing.getId())
+                    .firstName(existing.getFirstName())
+                    .lastName(existing.getLastName())
+                    .email(existing.getEmail())
+                    .password(existing.getPassword())
+                    .studentNumber(existing.getStudentNumber())
+                    .active(false)
+                    .banned(true)
+                    .build();
+            StudentRepository.save(banned);
+        });
+
+        //
+        OrganiserRepository.findById(userId).ifPresent(existing -> {
+            Organiser banned = new Organiser(existing, false);
+            OrganiserRepository.save(banned);
+        });
     }
 
     private String generatePin() {

@@ -14,4 +14,6 @@ public interface IAdminService {
     CreateAdminResponseDTO createAdmin(CreateAdminRequestDTO request, Long requestingAdminId);
     void changePassword(Long adminId, String currentPassword, String newPassword);
     Optional<Admin> authenticate(String email, String password);
+    // Ban
+    void banUser(Long userId, Long requestingAdminId);
 }

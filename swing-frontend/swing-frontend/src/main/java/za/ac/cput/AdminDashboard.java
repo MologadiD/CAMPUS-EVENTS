@@ -3,6 +3,7 @@ package za.ac.cput;
 import com.formdev.flatlaf.FlatLightLaf;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 public class AdminDashboard extends JFrame {
@@ -20,6 +21,7 @@ public class AdminDashboard extends JFrame {
     private JButton btnAdmins;
     private JButton btnNotifications;
     private JButton btnLogout;
+
 
     public AdminDashboard() {
         setTitle("Campus Events - Admin Dashboard");
@@ -131,7 +133,62 @@ public class AdminDashboard extends JFrame {
 
         return contentPanel;
     }
+    // Ban User
+    private void banUser(int row, String type) {
+        // confirm before banning
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Are you sure you want to ban this " + type + "? This cannot be undone.",
+                "Confirm Ban",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+        );
+        if (confirm != JOptionPane.YES_OPTION) return;
 
+        long id = getId(type.equals("student") ? "stu" : "org", row);
+
+        try {
+            apiPut("/api/admin/ban/" + id, map("requestingAdminId", ADMIN_ID));
+
+            // update row in place — grey out the row
+            DefaultTableModel model = type.equals("student") ? stuModel : orgModel;
+            int statusCol = type.equals("student") ? 4 : 3;
+            int actionCol = type.equals("student") ? 5 : 4;
+            int banCol    = type.equals("student") ? 6 : 5;
+
+            model.setValueAt("Banned",  statusCol == 4 ? statusCol : statusCol, row);
+            model.setValueAt("—",       actionCol, row);
+            model.setValueAt("Banned",  banCol,    row);
+            toast(type.substring(0,1).toUpperCase()
+                    + type.substring(1) + " banned successfully.");
+        } catch (Exception ex) {
+            toast(ex.getMessage(), true);
+        }
+    }
+
+    //Ban Render
+    class BanRenderer extends DefaultTableCellRenderer {
+        public Component getTableCellRendererComponent(
+                JTable t, Object v, boolean sel, boolean foc, int r, int c) {
+            String val = v == null ? "" : v.toString();
+            if ("Banned".equals(val)) {
+                JLabel l = new JLabel("Banned");
+                l.setFont(new Font("SansSerif", Font.BOLD, 11));
+                l.setForeground(BADGE_GREY_FG);
+                l.setHorizontalAlignment(CENTER);
+                l.setBorder(new EmptyBorder(0,8,0,0));
+                return l;
+            }
+            JButton btn = new JButton("Ban");
+            btn.setFont(new Font("SansSerif", Font.BOLD, 11));
+            btn.setBackground(new Color(198, 40, 40));
+            btn.setForeground(Color.WHITE);
+            btn.setFocusPainted(false);
+            btn.setBorderPainted(false);
+            btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            return btn;
+        }
+    }
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(new FlatLightLaf());

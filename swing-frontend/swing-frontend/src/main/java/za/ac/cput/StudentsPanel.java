@@ -57,6 +57,8 @@ public class StudentsPanel extends JPanel {
         table.setSelectionForeground(DARK_TEXT);
         table.setGridColor(new Color(220, 220, 220));
 
+
+
         table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
         table.getTableHeader().setBackground(CPUT_BLUE);
         table.getTableHeader().setForeground(Color.WHITE);
@@ -92,6 +94,8 @@ public class StudentsPanel extends JPanel {
         tableModel.addRow(new Object[]{"Sipho Nkosi", "sipho@mycput.ac.za", "219012345", "ICT", "Active", "Suspend"});
         tableModel.addRow(new Object[]{"Amahle Dube", "amahle@mycput.ac.za", "221098765", "Business", "Suspended", "Reactivate"});
     }
+
+
 public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(new FlatLightLaf());

@@ -293,6 +293,9 @@ public class Login extends JFrame {
 }
 
          */
+        //Ban
+        if (!Student.isActive() || Student.isBanned())
+            return fail("Your account has been banned");
     }
 
     public static void main(String[] args) {
